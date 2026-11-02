@@ -27,6 +27,10 @@ adds an English report beside the original (`onboarding.py`, `_installation_repo
 `en,en-orig,zh-Hans,zh` (Agent Reach: `zh-Hans,zh,en,en-orig`). Asking an English video for a Chinese machine
 translation first got HTTP 429 from YouTube on 2026-11-02 and paused the YouTube channel for an hour.
 
+**One-line install, like Agent Reach's:** an agent given
+`https://raw.githubusercontent.com/kang-blanc-tech/kang-eyes-agent/main/docs/install.md` follows it to a FULL install
+(every channel, not only the everyday ones), with no question an agent cannot answer.
+
 **Removed:** the upstream release workflow (`.github/workflows/release.yml`; it requires Agent Reach's own
 release-acceptance data for their exact source), the Chinese/English upstream READMEs (sponsors, community links),
 replaced by our `README.md`. **Rewritten:** `docs/install.md`. **Added:** `install.command` (the staff installer),

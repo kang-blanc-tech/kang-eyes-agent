@@ -6,7 +6,19 @@ in a video, Chinese platforms, and clean structured data. One command.
 Kang Eyes Agent is our own version of [Agent Reach](https://github.com/Panniantong/Agent-Reach) 1.6.1 (MIT
 License, © 2025 Agent Eyes). What we changed is listed in [KANG-EYES-CHANGES.md](KANG-EYES-CHANGES.md).
 
-## Install (staff)
+## Quick start: give it to your AI
+
+Send this one line to your AI agent (Hermes, Claude Code, Codex, Cursor, OpenClaw…):
+
+```
+Install Kang Eyes Agent: https://raw.githubusercontent.com/kang-blanc-tech/kang-eyes-agent/main/docs/install.md
+```
+
+The agent does the rest: it installs the program, adds every platform, and tells you what it did. Along the way it may
+ask to install `uv` (a small installer for command-line programs, no admin password). It never logs in for you and
+never asks for a password.
+
+## Install by hand (staff folder)
 
 1. Get the **Kang Eyes Agent** folder from Kang (it holds `kang-eyes.zip` and `install.command`).
 2. Double-click **`install.command`** (first time: right-click › Open). It installs the `kang-eyes` command and
