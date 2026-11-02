@@ -1,4 +1,4 @@
-"""Minimal Chrome DevTools Protocol client for the Agent Reach browser (127.0.0.1 only).
+"""Minimal Chrome DevTools Protocol client for the Kang Eyes Agent browser (127.0.0.1 only).
 
 Only used against the dedicated browser, never the user's own Chrome.
 Two transports: the 127.0.0.1 debugging port (`call`, any process) and the

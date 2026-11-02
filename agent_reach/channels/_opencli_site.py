@@ -9,7 +9,7 @@ from .base import Channel
 
 
 class OpenCLISiteChannel(Channel):
-    """A platform served only through OpenCLI in the Agent Reach browser."""
+    """A platform served only through OpenCLI in the Kang Eyes Agent browser."""
 
     site: str = ""
     domains: tuple[str, ...] = ()
@@ -34,8 +34,8 @@ class OpenCLISiteChannel(Channel):
     def _opencli(self, args, timeout: float, *, empty_is_error: bool = True) -> list:
         """Run one OpenCLI command for this site and return unified items."""
         hint = (
-            f"Run `agent-reach login {self.name}` and ask the user to log in to {self.login_hint} "
-            "in the Agent Reach browser window it opens. Never log in for them."
+            f"Run `kang-eyes login {self.name}` and ask the user to log in to {self.login_hint} "
+            "in the Kang Eyes Agent browser window it opens. Never log in for them."
         )
         try:
             items = opencli_items(opencli_call(self.site, list(args), timeout=timeout, login_hint=hint))

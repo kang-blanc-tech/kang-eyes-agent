@@ -1,8 +1,8 @@
-"""Old (1.5 and earlier) Agent Reach installs: find them and remove only Agent Reach itself.
+"""Old (1.5 and earlier) Kang Eyes Agent installs: find them and remove only Kang Eyes Agent itself.
 
-1.5 was installed with pipx or into `~/.agent-reach-venv`. After the user moves to
-the uv install, those copies would keep an old `agent-reach` on PATH, and a later
-`pipx upgrade-all` could put 1.5 back. Only Agent Reach's own package is removed;
+1.5 was installed with pipx or into `~/.kang-eyes-venv`. After the user moves to
+the uv install, those copies would keep an old `kang-eyes` on PATH, and a later
+`pipx upgrade-all` could put 1.5 back. Only Kang Eyes Agent's own package is removed;
 the user's other tools (twitter-cli, bili, ...) and data are never touched.
 """
 
@@ -43,7 +43,7 @@ def _pipx_venvs() -> List[Path]:
                  str(home / ".local" / "share" / "pipx" / "venvs"),
                  os.path.join(local, "pipx", "pipx", "venvs") if local else "",
                  str(home / "pipx" / "venvs")]
-    return [Path(d) / "agent-reach" for d in venv_dirs if d]
+    return [Path(d) / "kang-eyes" for d in venv_dirs if d]
 
 
 def _has_agent_reach(venv: Path) -> bool:
@@ -61,10 +61,10 @@ def _current() -> Path:
 
 
 def find() -> List[Dict[str, str]]:
-    """Old Agent Reach copies other than the one running now."""
+    """Old Kang Eyes Agent copies other than the one running now."""
     found: List[Dict[str, str]] = []
     seen = set()
-    for kind, venv in [("pipx", v) for v in _pipx_venvs()] + [("venv", home_dir() / ".agent-reach-venv")]:
+    for kind, venv in [("pipx", v) for v in _pipx_venvs()] + [("venv", home_dir() / ".kang-eyes-venv")]:
         try:
             real = venv.resolve()
         except OSError:
@@ -77,10 +77,10 @@ def find() -> List[Dict[str, str]]:
 
 
 def _drop_pipx_shims(venv: Path) -> None:
-    """Remove `agent-reach` launchers that still point into the old pipx venv."""
+    """Remove `kang-eyes` launchers that still point into the old pipx venv."""
     dirs = {os.environ.get("PIPX_BIN_DIR", ""), str(home_dir() / ".local" / "bin")}
     for d in filter(None, dirs):
-        shim = Path(d) / ("agent-reach.exe" if _WIN else "agent-reach")
+        shim = Path(d) / ("kang-eyes.exe" if _WIN else "kang-eyes")
         try:
             if shim.is_symlink() and Path(os.path.realpath(shim)).is_relative_to(venv.resolve()):
                 shim.unlink()
@@ -90,8 +90,8 @@ def _drop_pipx_shims(venv: Path) -> None:
 
 def _uninstall_package(venv: Path) -> bool:
     python = _python(venv)
-    for cmd in ([str(python), "-m", "pip", "uninstall", "-y", "-q", "agent-reach"],
-                [shutil.which("uv") or "uv", "pip", "uninstall", "-q", "--python", str(python), "agent-reach"]):
+    for cmd in ([str(python), "-m", "pip", "uninstall", "-y", "-q", "kang-eyes"],
+                [shutil.which("uv") or "uv", "pip", "uninstall", "-q", "--python", str(python), "kang-eyes"]):
         try:
             if subprocess.run(cmd, capture_output=True, timeout=120).returncode == 0:
                 return True
@@ -101,8 +101,8 @@ def _uninstall_package(venv: Path) -> bool:
 
 
 def remove() -> Dict[str, List[Dict[str, str]]]:
-    """Remove old Agent Reach copies. A pipx venv holds only Agent Reach, so it goes away;
-    `~/.agent-reach-venv` may hold other packages, so only Agent Reach is uninstalled there."""
+    """Remove old Kang Eyes Agent copies. A pipx venv holds only Kang Eyes Agent, so it goes away;
+    `~/.kang-eyes-venv` may hold other packages, so only Kang Eyes Agent is uninstalled there."""
     removed, failed = [], []
     for item in find():
         venv = Path(item["path"])
@@ -120,5 +120,5 @@ def remove() -> Dict[str, List[Dict[str, str]]]:
 
 def manual_command(item: Dict[str, str]) -> str:
     if item["kind"] == "pipx":
-        return "pipx uninstall agent-reach"
-    return f"{_python(Path(item['path']))} -m pip uninstall -y agent-reach"
+        return "pipx uninstall kang-eyes"
+    return f"{_python(Path(item['path']))} -m pip uninstall -y kang-eyes"

@@ -19,7 +19,7 @@ from .result import BAD_INPUT, NEED_SETUP, TIMEOUT, ReachError, _clean
 
 _DEFAULT_MAX_BYTES = 8 * 1024 * 1024
 # Some fronts (Exa's Cloudflare) block the default Python-urllib agent (error 1010).
-_USER_AGENT = f"agent-reach/{__version__}"
+_USER_AGENT = f"kang-eyes/{__version__}"
 _NPM_SHIM_SCRIPT = re.compile(r'"%dp0%\\(?P<script>[^"\r\n]*?\.(?:cjs|mjs|js))"', re.IGNORECASE)
 _CMD_METACHARS = frozenset('&|<>^()%!"\r\n')
 

@@ -31,7 +31,7 @@ def launch_spec() -> tuple[list[str], str]:
     exe = tools.resolve("opencli")
     node = tools.resolve("node")
     if not exe or not node:
-        raise ReachError(NEED_SETUP, "Run agent-reach add CHANNEL to install Node and OpenCLI")
+        raise ReachError(NEED_SETUP, "Run kang-eyes add CHANNEL to install Node and OpenCLI")
     resolved = Path(exe).resolve()
     # npm on Windows uses a .cmd shim beside node_modules; POSIX uses a symlink.
     candidates = [*resolved.parents, Path(exe).parent / "node_modules" / "@jackwener" / "opencli"]
@@ -58,7 +58,7 @@ def require_running() -> dict:
     current = require_compatible()
     if not current:
         raise ReachError(NEED_SETUP, "OpenCLI Bridge is not running; the site login could not be inspected",
-                         hint="Run agent-reach browser setup to reconnect the Bridge, then retry.")
+                         hint="Run kang-eyes browser setup to reconnect the Bridge, then retry.")
     return current
 
 

@@ -75,7 +75,7 @@ def _source_cookies(channel: str, domains) -> tuple[list, str]:
             found.append((cookies, context))
     if len(found) > 1:
         raise ReachError(NEED_SETUP, "Several local browsers have cookies for this site; choose which account to reuse",
-                         hint="Run agent-reach browser profiles, then browser use ID. No account was copied.")
+                         hint="Run kang-eyes browser profiles, then browser use ID. No account was copied.")
     if found:
         return found[0]
     # Older Reach versions stored the user's login in a per-site owned snapshot.
@@ -109,7 +109,7 @@ def prepare(channel: str, *, force: bool = False) -> dict:
         if force and not cookies:
             # An explicit import that found no login must not report success.
             raise ReachError(NEED_SETUP, "No local browser login was found for this site; nothing was copied",
-                             hint=f"Run agent-reach browser profiles to check the source browser, or agent-reach login {channel}.")
+                             hint=f"Run kang-eyes browser profiles to check the source browser, or kang-eyes login {channel}.")
         if cookies:
             current = cdp.call("Storage.getCookies")
             if current is None:

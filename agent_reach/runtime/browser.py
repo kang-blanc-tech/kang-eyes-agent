@@ -1,6 +1,6 @@
-"""The Agent Reach dedicated browser.
+"""The Kang Eyes Agent dedicated browser.
 
-One Reach-owned profile under ~/.agent-reach/browser/profile is shared by all
+One Reach-owned profile under ~/.kang-eyes/browser/profile is shared by all
 browser channels. CloakBrowser is preferred; installation/download failure falls
 back to installed Chrome. The existing watcher owns the browser, loads OpenCLI,
 and closes it after 600 seconds without use. Website adapters stay upstream.
@@ -38,7 +38,7 @@ DEFAULT_CDP_PORT = 9222
 
 
 def configured_port() -> int:
-    """Port from `agent-reach configure browser-port`, else 9222 (another tool may own 9222).
+    """Port from `kang-eyes configure browser-port`, else 9222 (another tool may own 9222).
 
     The watcher runs under the CloakBrowser Python (no yaml), so `_launch` hands it the port in the environment.
     """
@@ -58,7 +58,7 @@ CDP_PORT = configured_port()
 CDP_URL = f"http://127.0.0.1:{CDP_PORT}"
 _CONTEXT_RE = re.compile(r"^\s*(\S+)\s+[—-]\s+connected\b", re.M)
 
-#: Close the browser after this many seconds without Agent Reach use.
+#: Close the browser after this many seconds without Kang Eyes Agent use.
 IDLE_LIMIT = 600.0
 #: Longest wait for a cold start (measured ~42 s to OpenCLI connect on a Mac).
 START_WAIT = 90.0
@@ -70,11 +70,11 @@ _STORE_WAIT = 180.0
 
 OPENCLI_RELEASE_API = "https://api.github.com/repos/jackwener/OpenCLI/releases/latest"
 _EXTENSION_ASSET_RE = re.compile(r"^opencli-extension-.*\.zip$")
-_USER_AGENT = "agent-reach"
+_USER_AGENT = "kang-eyes"
 
 
 def browser_root() -> Path:
-    return home_dir() / ".agent-reach" / "browser"
+    return home_dir() / ".kang-eyes" / "browser"
 
 
 def profile_dir() -> Path:
@@ -138,7 +138,7 @@ def update_state(**changes) -> None:
 
 
 def touch() -> None:
-    """Record an Agent Reach use of the browser (resets the idle timer)."""
+    """Record an Kang Eyes Agent use of the browser (resets the idle timer)."""
     make_private_dir(browser_root())
     path = _last_used_path()
     # Create-if-missing without a rename: concurrent callers on Windows cannot replace a file another one holds.
@@ -225,7 +225,7 @@ def _locked(path: Path, wait: float) -> Iterator[None]:
             if time.monotonic() >= deadline:
                 from .result import UPSTREAM_BROKEN, ReachError
 
-                raise ReachError(UPSTREAM_BROKEN, "another Agent Reach process is still starting the browser")
+                raise ReachError(UPSTREAM_BROKEN, "another Kang Eyes Agent process is still starting the browser")
             time.sleep(0.2)
         yield
     finally:
@@ -338,7 +338,7 @@ def ensure_chrome(*, retry_cloak: bool = False) -> str:
         fallback = _system_chrome()
         if not fallback:
             raise ReachError(NEED_SETUP, "CloakBrowser could not be installed and no system Chrome was found",
-                             hint="Check the download/proxy connection, or install Chrome, then run agent-reach browser setup.") from None
+                             hint="Check the download/proxy connection, or install Chrome, then run kang-eyes browser setup.") from None
         update_state(backend="chrome", executable=fallback, launcher_python=None,
                      fallback_reason="CloakBrowser installation/download failed")
         return fallback
@@ -479,7 +479,7 @@ def _launch(url: str, *, headless: bool = True) -> None:
         subprocess.Popen(chrome_argv(exe, url, pipe=False, headless=headless), stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                          stderr=subprocess.DEVNULL, **_detach_kwargs())
         if not wait_for(is_running, START_WAIT):
-            raise ReachError(UPSTREAM_BROKEN, f"the Agent Reach browser did not open within {START_WAIT:.0f}s")
+            raise ReachError(UPSTREAM_BROKEN, f"the Kang Eyes Agent browser did not open within {START_WAIT:.0f}s")
         _spawn_watcher()
         return
     if not extension_version():
@@ -502,7 +502,7 @@ def _launch(url: str, *, headless: bool = True) -> None:
         tail = ""
         with contextlib.suppress(OSError):
             tail = watcher_log_path().read_text("utf-8", "replace").strip().splitlines()[-1][:300]
-        raise ReachError(UPSTREAM_BROKEN, "the Agent Reach browser did not open" + (f": {tail}" if tail else ""))
+        raise ReachError(UPSTREAM_BROKEN, "the Kang Eyes Agent browser did not open" + (f": {tail}" if tail else ""))
 
 
 def _spawn_watcher() -> None:
@@ -603,7 +603,7 @@ def ensure_running(context: Optional[str] = None) -> None:
             setup()
         else:
             raise ReachError(NEED_SETUP, "Enable the OpenCLI extension in the dedicated Chrome fallback",
-                             hint="Run agent-reach browser setup; no website login has been requested.")
+                             hint="Run kang-eyes browser setup; no website login has been requested.")
     touch()
 
 
@@ -658,8 +658,8 @@ def _require_owned() -> None:
         from .result import NEED_SETUP, ReachError
         raise ReachError(
             NEED_SETUP, f"Port {CDP_PORT} belongs to an unmanaged browser",
-            hint=f"Close that debugging session, or move Agent Reach to a free port: "
-                 f"`agent-reach configure browser-port <port>` (current {CDP_PORT}).")
+            hint=f"Close that debugging session, or move Kang Eyes Agent to a free port: "
+                 f"`kang-eyes configure browser-port <port>` (current {CDP_PORT}).")
 
 
 def save_session() -> None:
@@ -861,7 +861,7 @@ def setup(*, retry_cloak: bool = False, headless: bool = True) -> dict:
                     return status()
                 if visible:
                     from .result import ReachError
-                    raise ReachError("BUSY", "A login window is open in the Agent Reach browser",
+                    raise ReachError("BUSY", "A login window is open in the Kang Eyes Agent browser",
                                      hint="Wait until the user says they finished logging in; do not close the window.")
             _close_for_restart()  # release profile and watcher before switching modes
             _launch("about:blank", headless=headless)
@@ -877,7 +877,7 @@ def setup(*, retry_cloak: bool = False, headless: bool = True) -> dict:
                 from .result import UPSTREAM_BROKEN, ReachError
 
                 raise ReachError(
-                    UPSTREAM_BROKEN, "the OpenCLI extension did not connect to OpenCLI in the Agent Reach browser",
+                    UPSTREAM_BROKEN, "the OpenCLI extension did not connect to OpenCLI in the Kang Eyes Agent browser",
                     hint=f"Details: {watcher_log_path()}. Check `opencli profile list` works.",
                 )
         touch()
@@ -896,12 +896,12 @@ def _setup_from_store() -> dict:
         found = wait_for(lambda: result.update(bind()) or result["status"] != "waiting_for_extension", _STORE_WAIT)
         if not found:
             raise ReachError(
-                NEED_SETUP, "waiting for the OpenCLI extension in the Agent Reach browser",
-                hint="Ask the user to click 'Add to Chrome' in the window that just opened, then run `agent-reach browser setup` again.",
+                NEED_SETUP, "waiting for the OpenCLI extension in the Kang Eyes Agent browser",
+                hint="Ask the user to click 'Add to Chrome' in the window that just opened, then run `kang-eyes browser setup` again.",
             )
     if result["status"] != "ready":
-        raise ReachError(NEED_SETUP, "waiting for the OpenCLI extension in the Agent Reach browser",
-                         hint="Run `agent-reach browser setup` again after the extension is added.")
+        raise ReachError(NEED_SETUP, "waiting for the OpenCLI extension in the Kang Eyes Agent browser",
+                         hint="Run `kang-eyes browser setup` again after the extension is added.")
     return status()
 
 
@@ -935,5 +935,5 @@ def setup_problems() -> List[str]:
     macOS/Linux set the browser up by themselves on first use, so nothing blocks there.
     """
     if not can_load_extension() and not bound_context():
-        return ["Agent Reach browser not set up: run `agent-reach browser setup`"]
+        return ["Kang Eyes Agent browser not set up: run `kang-eyes browser setup`"]
     return []

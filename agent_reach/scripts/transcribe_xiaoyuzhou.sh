@@ -70,9 +70,9 @@ then
     exit 1
 fi
 
-# Try env var first, then agent-reach config.yaml
+# Try env var first, then kang-eyes config.yaml
 if [ -z "$GROQ_API_KEY" ]; then
-    CONFIG_FILE="$HOME/.agent-reach/config.yaml"
+    CONFIG_FILE="$HOME/.kang-eyes/config.yaml"
     if [ -f "$CONFIG_FILE" ]; then
         ensure_python || exit 1
         CONFIG_FOR_PYTHON="$CONFIG_FILE"
@@ -84,7 +84,7 @@ if [ -z "$GROQ_API_KEY" ]; then
             2>/dev/null || true)
     fi
 fi
-GROQ_API_KEY="${GROQ_API_KEY:?请设置 GROQ_API_KEY 环境变量或运行 agent-reach configure groq-key}"
+GROQ_API_KEY="${GROQ_API_KEY:?请设置 GROQ_API_KEY 环境变量或运行 kang-eyes configure groq-key}"
 
 # Groq API 限制: 25MB per file
 MAX_CHUNK_SIZE_MB=20
@@ -98,12 +98,12 @@ MAX_AUDIO_BYTES=1073741824
 MAX_API_RESPONSE_BYTES=33554432
 MAX_DURATION_SECONDS=10800
 
-TEMP_ROOT="${TMPDIR:-$HOME/.agent-reach/tmp}"
+TEMP_ROOT="${TMPDIR:-$HOME/.kang-eyes/tmp}"
 if command -v cygpath >/dev/null 2>&1; then
     TEMP_ROOT=$(cygpath -u "$TEMP_ROOT")
 fi
 mkdir -p -- "$TEMP_ROOT" || exit 1
-if ! WORK_DIR=$(mktemp -d "${TEMP_ROOT%/}/agent-reach-xiaoyuzhou.XXXXXX"); then
+if ! WORK_DIR=$(mktemp -d "${TEMP_ROOT%/}/kang-eyes-xiaoyuzhou.XXXXXX"); then
     echo "❌ 无法创建临时目录" >&2
     exit 1
 fi
@@ -146,7 +146,7 @@ curl --fail --show-error --location --silent \
 FILE_SIZE=$(ls -lh "$WORK_DIR/original.$EXT" | awk '{print $5}')
 echo "📦 文件大小: $FILE_SIZE"
 
-# Step 3: 获取时长（用 ffmpeg 自己读：Agent Reach 自带的 ffmpeg 没有 ffprobe）
+# Step 3: 获取时长（用 ffmpeg 自己读：Kang Eyes Agent 自带的 ffmpeg 没有 ffprobe）
 DURATION_RAW=$(ffmpeg -hide_banner -i "$WORK_DIR/original.$EXT" 2>&1 \
     | awk '/Duration: [0-9]+:[0-9]+:[0-9.]+/ { split($2, t, ":"); sub(",", "", t[3]); printf "%.3f", t[1] * 3600 + t[2] * 60 + t[3]; exit }')
 if [ -z "$DURATION_RAW" ]; then
@@ -272,7 +272,7 @@ for i in $(seq 0 $((NUM_CHUNKS - 1))); do
         else
             case "$HTTP_CODE" in
                 5??)
-                    echo "   可尝试兜底：agent-reach transcribe \"$AUDIO_URL\""
+                    echo "   可尝试兜底：kang-eyes transcribe \"$AUDIO_URL\""
                     ;;
             esac
             exit 1
@@ -327,7 +327,7 @@ def call_groq(text):
         headers={
             "Authorization": f"Bearer {KEY}",
             "Content-Type": "application/json",
-            "User-Agent": "agent-reach-xiaoyuzhou/1.0",
+            "User-Agent": "kang-eyes-xiaoyuzhou/1.0",
         },
     )
     with urllib.request.urlopen(req, timeout=180) as r:
@@ -367,7 +367,7 @@ fi
 echo "📄 正在合并文字稿..."
 
 if [ -z "$OUTPUT" ]; then
-    if ! OUTPUT=$(mktemp "${TEMP_ROOT%/}/agent-reach-transcript.XXXXXX"); then
+    if ! OUTPUT=$(mktemp "${TEMP_ROOT%/}/kang-eyes-transcript.XXXXXX"); then
         echo "❌ 无法安全创建输出文件" >&2
         exit 1
     fi

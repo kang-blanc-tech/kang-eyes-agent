@@ -1,4 +1,4 @@
-"""Run every declared channel action through the real `agent-reach` CLI and write the
+"""Run every declared channel action through the real `kang-eyes` CLI and write the
 release acceptance record that `check_release_acceptance.py` (and the release workflow) require.
 
 Run on the maintainer's machine after the needed logins/keys are in place:
@@ -87,7 +87,7 @@ def main() -> int:
     data = state.load()
     for ch in channels:
         if not manage.is_added(ch, data):
-            pending += [{"channel": ch.name, "action": a.name, "reason": f"not added: run `agent-reach add {ch.name}`"}
+            pending += [{"channel": ch.name, "action": a.name, "reason": f"not added: run `kang-eyes add {ch.name}`"}
                         for a in ch.actions]
             print(f"{ch.name}: not added, skipped")
             continue

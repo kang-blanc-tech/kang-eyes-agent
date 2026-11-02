@@ -107,7 +107,7 @@ def isolated_home(tmp_path, monkeypatch):
         return original_popen(argv, *args, **kwargs)
     monkeypatch.setattr(subprocess, "Popen", local_commands_only)
 
-    config_dir = home / ".agent-reach"
+    config_dir = home / ".kang-eyes"
     monkeypatch.setattr(Config, "CONFIG_DIR", config_dir)
     monkeypatch.setattr(Config, "CONFIG_FILE", config_dir / "config.yaml")
     return home

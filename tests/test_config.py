@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for Agent Reach config module."""
+"""Tests for Kang Eyes Agent config module."""
 
 import pytest
 

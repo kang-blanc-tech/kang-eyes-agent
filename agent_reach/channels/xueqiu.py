@@ -22,9 +22,9 @@ from agent_reach.runtime.run import http_request
 from .base import Action, Channel, Param
 
 _XQ_LOGIN_HINT = (
-    "Xueqiu community data needs a browser session. Run `agent-reach login xueqiu`, "
-    "let the user open xueqiu.com in the Agent Reach browser, then run "
-    "`agent-reach login xueqiu --sync`. The session expires within hours; repeat these steps when it does."
+    "Xueqiu community data needs a browser session. Run `kang-eyes login xueqiu`, "
+    "let the user open xueqiu.com in the Kang Eyes Agent browser, then run "
+    "`kang-eyes login xueqiu --sync`. The session expires within hours; repeat these steps when it does."
 )
 
 _UA = (
@@ -74,7 +74,7 @@ def _inject_cookie_string(cookie_str: str) -> None:
 
 
 def _load_cookies_from_config(config=None) -> bool:
-    """Try to load Xueqiu cookies from agent-reach config file (xueqiu_cookie key)."""
+    """Try to load Xueqiu cookies from kang-eyes config file (xueqiu_cookie key)."""
     try:
         from ..config import Config
 
@@ -92,7 +92,7 @@ def _ensure_cookies(config=None) -> None:
     """Populate session cookies without touching browser credential stores.
 
     Priority order:
-    1. Saved cookie string in ~/.agent-reach/config.yaml  (set by `agent-reach login xueqiu --sync`)
+    1. Saved cookie string in ~/.kang-eyes/config.yaml  (set by `kang-eyes login xueqiu --sync`)
     2. Homepage visit fallback (only yields public session cookies and may not
        be sufficient when Xueqiu requires a logged-in session)
     """
@@ -241,8 +241,8 @@ class XueqiuChannel(Channel):
     def sync_login(self):
         if not _import_from_browser():
             raise ReachError(
-                NEED_LOGIN, "no Xueqiu session found in the Agent Reach browser",
-                hint="Run `agent-reach login xueqiu`, let the user open xueqiu.com there, then `agent-reach login xueqiu --sync`.",
+                NEED_LOGIN, "no Xueqiu session found in the Kang Eyes Agent browser",
+                hint="Run `kang-eyes login xueqiu`, let the user open xueqiu.com there, then `kang-eyes login xueqiu --sync`.",
             )
         return {"synced": "xueqiu_cookie"}
 

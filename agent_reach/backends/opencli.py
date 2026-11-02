@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""OpenCLI backend: run `opencli <site> ...` in the Agent Reach browser.
+"""OpenCLI backend: run `opencli <site> ...` in the Kang Eyes Agent browser.
 
 OpenCLI (github.com/jackwener/opencli) drives Chrome through a browser-bridge
-extension + local daemon. Agent Reach uses one shared, Reach-owned browser profile.
+extension + local daemon. Kang Eyes Agent uses one shared, Reach-owned browser profile.
 """
 
 import json

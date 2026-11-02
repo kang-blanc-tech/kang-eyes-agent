@@ -1,4 +1,4 @@
-"""Unified entry for Agent Reach.
+"""Unified entry for Kang Eyes Agent.
 
 Agent commands:      <channel> <action>, read <url>, channels
 Management commands: setup, add, remove, login, logout, browser, skill, doctor,
@@ -41,28 +41,28 @@ _MANAGEMENT = (
     "setup", "add", "remove", "update", "doctor", "uninstall", "configure", "version",
 )
 
-HELP = """agent-reach — internet access for AI agents (all output is JSON)
+HELP = """kang-eyes — internet access for AI agents (all output is JSON)
 
 For agents:
-  agent-reach channels                    list channels, actions, params
-  agent-reach <channel> <action> [args]   e.g. agent-reach bilibili search python
-  agent-reach read <url>                  read a link with the matching channel
+  kang-eyes channels                    list channels, actions, params
+  kang-eyes <channel> <action> [args]   e.g. kang-eyes bilibili search python
+  kang-eyes read <url>                  read a link with the matching channel
   Search/read try declared public web routes first; --backend selects a site tool
   --backend public-web                  public access only; no browser fallback
 
 For the user:
-  agent-reach setup [--text]              install defaults and skill; --text displays the capability tables
-  agent-reach add <channel>               install channel dependencies and prepare its browser
-  agent-reach remove <channel>            remove a channel (defaults too) and what only it used
-  agent-reach login|logout <channel>      log in (the user does it) / forget the login
-  agent-reach browser setup|status|stop   headless shared browser; login opens a window
-  agent-reach browser profiles|use ID    choose an existing local login source
-  agent-reach skill [link <skills-dir>]   where the agent skill is; link it for another AI
-  agent-reach doctor [--text]             status of every channel and installed tool versions (no network)
-  agent-reach check [channel] [--text]    live-test channels; --search tests search/jobs only
-  agent-reach update [--check]            upgrade Agent Reach, every added channel's tools and the skill
-  agent-reach configure <key> [value]     groq-key | openai-key | proxy | github-token | browser-port
-  agent-reach uninstall [--dry-run]       remove everything Agent Reach installed
+  kang-eyes setup [--text]              install defaults and skill; --text displays the capability tables
+  kang-eyes add <channel>               install channel dependencies and prepare its browser
+  kang-eyes remove <channel>            remove a channel (defaults too) and what only it used
+  kang-eyes login|logout <channel>      log in (the user does it) / forget the login
+  kang-eyes browser setup|status|stop   headless shared browser; login opens a window
+  kang-eyes browser profiles|use ID    choose an existing local login source
+  kang-eyes skill [link <skills-dir>]   where the agent skill is; link it for another AI
+  kang-eyes doctor [--text]             status of every channel and installed tool versions (no network)
+  kang-eyes check [channel] [--text]    live-test channels; --search tests search/jobs only
+  kang-eyes update [--check]            upgrade Kang Eyes Agent, every added channel's tools and the skill
+  kang-eyes configure <key> [value]     groq-key | openai-key | proxy | github-token | browser-port
+  kang-eyes uninstall [--dry-run]       remove everything Kang Eyes Agent installed
 """
 
 
@@ -115,7 +115,7 @@ def _emit(payload: dict) -> int:
 
 
 def _usage(channel: Channel, action: Action) -> str:
-    parts = ["agent-reach", channel.name, action.name]
+    parts = ["kang-eyes", channel.name, action.name]
     for p in action.params:
         parts.append(f"<{p.name}>" if p.required else f"[--{p.name} {p.name.upper()}]")
     return " ".join(parts)
@@ -168,7 +168,7 @@ def _cmd_read(args: Sequence[str]) -> int:
     try:
         ns = parser.parse_args(list(args))
     except _ArgError as exc:
-        return _bad_input(None, "read", f"{exc}; usage: agent-reach read <url>")
+        return _bad_input(None, "read", f"{exc}; usage: kang-eyes read <url>")
     readers = [ch for ch in unified_channels() if find_action(ch, "read")]
     specific = [ch for ch in readers if ch.name != "web"]
     target = next((ch for ch in specific if ch.can_handle(ns.url)), None)
@@ -216,8 +216,8 @@ def _cmd_channels(_args: Sequence[str]) -> int:
             "schema_version": SCHEMA_VERSION,
             "ok": True,
             "commands": {
-                "read": "agent-reach read <url>  (picks the channel from the URL)",
-                "action": "agent-reach <channel> <action> [args] [--timeout SECONDS]",
+                "read": "kang-eyes read <url>  (picks the channel from the URL)",
+                "action": "kang-eyes <channel> <action> [args] [--timeout SECONDS]",
             },
             "channels": channels,
         }
@@ -264,7 +264,7 @@ def _cmd_doctor(args: Sequence[str]) -> int:
     if not ns.text:
         return _mgmt("doctor", manage.doctor)
     result = manage.doctor()
-    sys.stdout.write(f"Agent Reach {result['version']}\n\n")
+    sys.stdout.write(f"Kang Eyes Agent {result['version']}\n\n")
     for c in result["channels"]:
         extra = "; ".join(c["problems"]) or c.get("hint", "")
         if c["regressed"]:
@@ -283,7 +283,7 @@ def _cmd_skill(args: Sequence[str]) -> int:
     if not args:
         return _mgmt("skill", manage.skill_status)
     if args[0] != "link" or len(args) != 2:
-        return _bad_input(None, "skill", "usage: agent-reach skill [link <skills-dir>]")
+        return _bad_input(None, "skill", "usage: kang-eyes skill [link <skills-dir>]")
     return _mgmt("skill link", manage.link_skill, args[1])
 
 
@@ -377,9 +377,9 @@ def _apply_saved_proxy() -> None:
 
 def _login_info(ch: Channel):
     if ch.login_url:
-        return {"via": "browser", "logged_in": None, "command": f"agent-reach login {ch.name}"}
+        return {"via": "browser", "logged_in": None, "command": f"kang-eyes login {ch.name}"}
     if ch.session:
-        return {"via": "session", "logged_in": has_login_state(ch.session), "command": f"agent-reach login {ch.name}"}
+        return {"via": "session", "logged_in": has_login_state(ch.session), "command": f"kang-eyes login {ch.name}"}
     return None
 
 
@@ -394,10 +394,10 @@ def _login_channel(cmd: str, args: Sequence[str]):
     if ch is None:
         raise _ArgError(f"unknown channel: {ns.channel}")
     if cmd == "logout" and not (ch.session or ch.logout_keys or ch.login_url):
-        hint = " Log out in the Agent Reach browser window instead." if ch.login_url else ""
-        raise _ArgError(f"{ch.name} has no login state managed by Agent Reach.{hint}")
+        hint = " Log out in the Kang Eyes Agent browser window instead." if ch.login_url else ""
+        raise _ArgError(f"{ch.name} has no login state managed by Kang Eyes Agent.{hint}")
     if cmd == "login" and not (ch.session or ch.login_url):
-        raise _ArgError(f"{ch.name} has no login managed by Agent Reach")
+        raise _ArgError(f"{ch.name} has no login managed by Kang Eyes Agent")
     return ch, ns
 
 
@@ -428,22 +428,22 @@ def _cmd_login(args: Sequence[str]) -> int:
         from . import manage
 
         nxt = manage.browser_login_next(ch)
-        return _emit(envelope(channel=ch.name, action="login", backend="agent-reach-browser",
+        return _emit(envelope(channel=ch.name, action="login", backend="kang-eyes-browser",
                               items=[{"opened": ch.login_url, "next": nxt}]))
     try:
         synced = ch.sync_login()
     except ReachError as err:
         return _emit(envelope(channel=ch.name, action="login", error=err))
     if synced is not None:
-        return _emit(envelope(channel=ch.name, action="login", backend="agent-reach-browser", items=[synced]))
+        return _emit(envelope(channel=ch.name, action="login", backend="kang-eyes-browser", items=[synced]))
     if not ch.login_argv:
-        return _bad_input(ch.name, "login", f"{ch.name} has nothing to sync; just log in in the Agent Reach browser")
+        return _bad_input(ch.name, "login", f"{ch.name} has nothing to sync; just log in in the Kang Eyes Agent browser")
     from .tools import resolve
 
     exe = resolve(ch.login_argv[0])
     if not exe:
         return _emit(envelope(channel=ch.name, action="login", error=ReachError(
-            NEED_SETUP, f"{ch.login_argv[0]} is not installed", hint=f"Run `agent-reach add {ch.name}` first.")))
+            NEED_SETUP, f"{ch.login_argv[0]} is not installed", hint=f"Run `kang-eyes add {ch.name}` first.")))
     from .browser import CDP_URL
     from .sessions import session_dir
 
@@ -560,5 +560,5 @@ def main(argv: Sequence[str]) -> int:
         return _cmd_management(head, rest)
     channel = _channel(head)
     if channel is None:
-        return _bad_input(None, head, f"unknown command or channel: {head}; run `agent-reach help`")
+        return _bad_input(None, head, f"unknown command or channel: {head}; run `kang-eyes help`")
     return _cmd_action(channel, rest)

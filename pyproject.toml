@@ -1,11 +1,11 @@
 [project]
-name = "agent-reach"
-version = "1.6.1"
-description = "Internet access for AI agents: one CLI with JSON output to search and read the web, YouTube, GitHub, V2EX and more."
+name = "kang-eyes"
+version = "1.6.1.1"
+description = "Kang Eyes Agent (based on Agent Reach 1.6.1, MIT): internet access for AI agents: one CLI with JSON output to search and read the web, YouTube, GitHub, V2EX and more."
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
-authors = [{name = "Neo Reid"}]
+authors = [{name = "Chamrong Keo (Kang Eyes Agent)"}, {name = "Neo Reid (original Agent Reach)"}]
 keywords = [
     "ai-agent", "llm-tools", "agent-infrastructure",
     "web-reader", "web-scraper", "search",
@@ -44,12 +44,12 @@ dev = [
 ]
 
 [project.scripts]
-agent-reach = "agent_reach.cli:main"
+kang-eyes = "agent_reach.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/Panniantong/agent-reach"
-Repository = "https://github.com/Panniantong/agent-reach"
-Issues = "https://github.com/Panniantong/agent-reach/issues"
+Homepage = "https://github.com/kang-blanc-tech/kang-eyes-agent"
+Repository = "https://github.com/kang-blanc-tech/kang-eyes-agent"
+Issues = "https://github.com/kang-blanc-tech/kang-eyes-agent/issues"
 
 [build-system]
 requires = ["hatchling"]

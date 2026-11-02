@@ -171,7 +171,7 @@ def test_failures_still_print_an_envelope_and_exit_one(capsys, fake_cli):
     assert code == 1
     assert set(out) == ENVELOPE_KEYS
     assert out["error"]["code"] == "BAD_INPUT"
-    assert "usage: agent-reach fake search <query>" in out["error"]["message"]
+    assert "usage: kang-eyes fake search <query>" in out["error"]["message"]
 
 
 def test_read_routes_by_url(capsys, fake_cli):
@@ -187,14 +187,14 @@ def test_unknown_command_is_bad_input(capsys, fake_cli):
         assert code == 1
         assert out["ok"] is False
         assert out["error"]["code"] == "BAD_INPUT"
-        assert "agent-reach help" in out["error"]["message"]
+        assert "kang-eyes help" in out["error"]["message"]
 
 
 def test_channels_lists_usage_for_agents(capsys, fake_cli):
     code, out = _run(capsys, ["channels"])
     assert code == 0
     action = out["channels"][0]["actions"][0]
-    assert action["usage"] == "agent-reach fake search <query> [--limit LIMIT]"
+    assert action["usage"] == "kang-eyes fake search <query> [--limit LIMIT]"
     assert action["backends"] == ["first", "second"]
 
 
@@ -219,7 +219,7 @@ def test_skill_command_links_a_skills_dir_and_reports_it(capsys, fake_cli):
     target = home_dir() / "my-ai" / "skills"
     code, out = _run(capsys, ["skill", "link", str(target)])
     assert code == 0 and out["action"] == "skill link"
-    assert out["result"]["links"] == [str(target / "agent-reach")]
+    assert out["result"]["links"] == [str(target / "kang-eyes")]
     code, out = _run(capsys, ["skill"])
     assert code == 0 and out["result"]["installed"] is True
     code, out = _run(capsys, ["skill", "unlink"])
@@ -285,7 +285,7 @@ def test_v2ex_topic_id_forms():
         _parse_topic_id("https://example.com/t/1000")
 
 
-# ── login state under ~/.agent-reach/sessions ──
+# ── login state under ~/.kang-eyes/sessions ──
 
 
 class SessionChannel(FakeChannel):
@@ -307,7 +307,7 @@ def test_session_env_points_tool_home_into_agent_reach(session_cli):
     from agent_reach.runtime.sessions import session_env
 
     env = session_env("fake-tool")
-    assert env["HOME"] == str(session_cli / ".agent-reach" / "sessions" / "fake-tool")
+    assert env["HOME"] == str(session_cli / ".kang-eyes" / "sessions" / "fake-tool")
 
 
 def test_import_existing_copies_old_login_only_on_request(capsys, session_cli):
@@ -316,7 +316,7 @@ def test_import_existing_copies_old_login_only_on_request(capsys, session_cli):
     (old / "credential.json").write_text("{}")
     code, out = _run(capsys, ["login", "sess", "--import-existing"])
     assert code == 0
-    assert (session_cli / ".agent-reach" / "sessions" / "fake-tool" / ".fake-tool" / "credential.json").exists()
+    assert (session_cli / ".kang-eyes" / "sessions" / "fake-tool" / ".fake-tool" / "credential.json").exists()
     assert old.exists(), "the original login is left untouched"
 
 
@@ -327,8 +327,8 @@ def test_logout_removes_only_that_session(capsys, session_cli):
     (session_dir("other") / "y").write_text("1")
     code, out = _run(capsys, ["logout", "sess"])
     assert code == 0 and out["items"] == [{"removed": True}]
-    assert not (session_cli / ".agent-reach" / "sessions" / "fake-tool").exists()
-    assert (session_cli / ".agent-reach" / "sessions" / "other" / "y").exists()
+    assert not (session_cli / ".kang-eyes" / "sessions" / "fake-tool").exists()
+    assert (session_cli / ".kang-eyes" / "sessions" / "other" / "y").exists()
 
 
 def test_login_rejects_channels_without_managed_login(capsys, session_cli):
@@ -341,14 +341,14 @@ def test_channels_reports_login_status(capsys, session_cli):
 
     _, out = _run(capsys, ["channels"])
     sess = next(c for c in out["channels"] if c["name"] == "sess")
-    assert sess["login"] == {"via": "session", "logged_in": False, "command": "agent-reach login sess"}
+    assert sess["login"] == {"via": "session", "logged_in": False, "command": "kang-eyes login sess"}
     assert next(c for c in out["channels"] if c["name"] == "fake")["login"] is None
     (session_dir("fake-tool") / "cookie").write_text("1")
     _, out = _run(capsys, ["channels"])
     assert next(c for c in out["channels"] if c["name"] == "sess")["login"]["logged_in"] is True
 
 
-# ── Agent Reach dedicated browser ──
+# ── Kang Eyes Agent dedicated browser ──
 
 
 @pytest.fixture
@@ -526,7 +526,7 @@ def test_wrong_record_is_repaired_before_a_query_uses_it(fake_browser):
     from agent_reach.runtime import browser
 
     browser.setup()
-    browser.update_state(opencli_context="daily")  # e.g. written by an older Agent Reach
+    browser.update_state(opencli_context="daily")  # e.g. written by an older Kang Eyes Agent
     browser.ensure_running()
     assert browser.bound_context() == "dedicated"
 
@@ -570,7 +570,7 @@ def test_browser_left_open_without_watcher_is_reopened_with_extension(fake_brows
     from agent_reach.runtime.browser_binding import environment
 
     browser.setup()
-    fake_browser["contexts"].remove("dedicated")  # e.g. opened by an older Agent Reach, no extension
+    fake_browser["contexts"].remove("dedicated")  # e.g. opened by an older Kang Eyes Agent, no extension
     monkeypatch.setattr(browser, "watcher_running", lambda: False)
     assert environment("reddit") ["OPENCLI_PROFILE"] == "dedicated"
     assert fake_browser["launches"] == 2
@@ -640,7 +640,7 @@ def test_query_uses_an_open_login_window_without_closing_it(fake_browser):
     browser.setup()
     browser.update_state(headless=False)  # the user is logging in in a visible window
     browser.ensure_running()
-    browser.setup()  # e.g. `agent-reach add` while the window is open
+    browser.setup()  # e.g. `kang-eyes add` while the window is open
     assert browser._load_state()["headless"] is False
     assert fake_browser["running"] and fake_browser["launches"] == 1
 

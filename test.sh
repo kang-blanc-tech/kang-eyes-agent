@@ -1,12 +1,12 @@
 #!/bin/bash
-# Agent Reach clean-environment integration test.
+# Kang Eyes Agent clean-environment integration test.
 # Creates an isolated venv and HOME, installs this checkout, runs the
 # read-only CLI commands, then executes the repository test suite.
 
 set -euo pipefail
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-TEST_DIR=$(mktemp -d "${TMPDIR:-/tmp}/agent-reach-test.XXXXXX")
+TEST_DIR=$(mktemp -d "${TMPDIR:-/tmp}/kang-eyes-test.XXXXXX")
 TEST_DIR=$(cd "$TEST_DIR" && pwd -P)
 export HOME="$TEST_DIR/home"
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -49,13 +49,13 @@ python -m pip install --quiet --upgrade pip
 python -m pip install --quiet -c "$REPO_ROOT/constraints.txt" -e "$REPO_ROOT[dev]"
 
 echo "[3/4] Running read-only CLI commands"
-agent-reach version
-agent-reach channels > "$TEST_DIR/channels.json"
+kang-eyes version
+kang-eyes channels > "$TEST_DIR/channels.json"
 python -c 'import json,sys; d=json.load(open(sys.argv[1], encoding="utf-8")); assert d["ok"] and d["channels"], d; print(f"channels OK: {len(d[\"channels\"])}")' "$TEST_DIR/channels.json"
-agent-reach doctor > "$TEST_DIR/doctor.json"
+kang-eyes doctor > "$TEST_DIR/doctor.json"
 python -c 'import json,sys; d=json.load(open(sys.argv[1], encoding="utf-8")); assert "ok" in d, d; print("doctor OK")' "$TEST_DIR/doctor.json"
 
 echo "[4/4] Running repository tests"
 pytest "$REPO_ROOT/tests" -q
 
-echo "Agent Reach integration test passed"
+echo "Kang Eyes Agent integration test passed"

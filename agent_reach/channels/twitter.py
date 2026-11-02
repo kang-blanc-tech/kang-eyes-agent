@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Twitter/X — OpenCLI in the Agent Reach browser (experimental)."""
+"""Twitter/X — OpenCLI in the Kang Eyes Agent browser (experimental)."""
 
 from agent_reach.backends.opencli import opencli_call, opencli_items
 from agent_reach.runtime.result import UPSTREAM_BROKEN, ReachError
@@ -8,7 +8,7 @@ from agent_reach.utils.url import host_matches
 from .base import Action, Channel, Param
 
 _TWITTER_LOGIN_HINT = (
-    "Ask the user to log in to x.com in the Agent Reach dedicated browser. Never log in on their behalf."
+    "Ask the user to log in to x.com in the Kang Eyes Agent dedicated browser. Never log in on their behalf."
 )
 
 

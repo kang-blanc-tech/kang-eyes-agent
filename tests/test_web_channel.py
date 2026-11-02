@@ -39,7 +39,7 @@ def test_exa_request_identifies_agent_reach_not_python_urllib():
     resp.headers = {}
     with patch("agent_reach.runtime.run.urllib.request.urlopen", return_value=resp) as urlopen:
         _exa_call("web_search_exa", {"query": "q"}, 5)
-    assert urlopen.call_args.args[0].get_header("User-agent").startswith("agent-reach/")
+    assert urlopen.call_args.args[0].get_header("User-agent").startswith("kang-eyes/")
 
 
 def test_exa_retries_a_truncated_read_once_within_the_same_budget():

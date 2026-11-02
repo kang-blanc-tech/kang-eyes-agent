@@ -61,7 +61,7 @@ def test_site_export_reports_a_missing_bridge_without_reading_cookies(monkeypatc
 
     assert caught.value.code == "NEED_SETUP"
     assert "Bridge" in caught.value.message
-    assert "agent-reach browser setup" in caught.value.hint
+    assert "kang-eyes browser setup" in caught.value.hint
 
 
 def test_automatic_reuse_copies_only_the_requested_site_and_reuses_cache(monkeypatch):
@@ -194,7 +194,7 @@ def test_missing_bridge_is_not_recorded_as_an_empty_site_session(monkeypatch):
 
     assert caught.value.code == "NEED_SETUP"
     assert "Bridge" in caught.value.message
-    assert "agent-reach browser setup" in caught.value.hint
+    assert "kang-eyes browser setup" in caught.value.hint
     assert "xiaohongshu" not in state.load().get("session_reuse", {})
 
 
@@ -266,7 +266,7 @@ def test_dispatch_reports_missing_bridge_before_calling_the_site_backend(monkeyp
 
     assert not result["ok"]
     assert result["error"]["code"] == "NEED_SETUP"
-    assert "agent-reach browser setup" in result["error"]["hint"]
+    assert "kang-eyes browser setup" in result["error"]["hint"]
     assert result["meta"]["attempts"][0]["result"] == "NEED_SETUP"
     assert "xiaohongshu" not in state.load().get("session_reuse", {})
     health = state.load()["backend_health"]["xiaohongshu"]["search"]["opencli"]

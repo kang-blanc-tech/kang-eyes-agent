@@ -75,7 +75,7 @@ class BossChannel(Channel):
         endpoint = require_boss_cdp()
         exe = resolve("boss")
         if not exe:
-            raise ReachError(NEED_SETUP, "Run agent-reach add boss first")
+            raise ReachError(NEED_SETUP, "Run kang-eyes add boss first")
         python = Path(exe).with_name("python.exe" if os.name == "nt" else "python")
         stamp = state.load().get("session_reuse", {}).get("boss", {}).get("at")
         payload = {**payload, "cdp_url": endpoint, "data_dir": str(session_dir(self.session) / ".boss-agent"),
@@ -108,7 +108,7 @@ class BossChannel(Channel):
             if "AUTH" in code or "LOGIN" in code:
                 raise ReachError(
                     NEED_LOGIN, message,
-                    hint="Run agent-reach login boss; reuse the selected CDP browser and sync only after confirming login.",
+                    hint="Run kang-eyes login boss; reuse the selected CDP browser and sync only after confirming login.",
                 )
             raise ReachError(UPSTREAM_BROKEN, message)
         data = payload.get("data")
@@ -147,7 +147,7 @@ class BossChannel(Channel):
             raise ReachError("BAD_INPUT", "Expected a direct BOSS job URL")
         try:
             rows = opencli_call("boss", ["detail", match.group(1)], timeout=timeout,
-                                login_hint="Run agent-reach login boss; complete login yourself in the dedicated browser.")
+                                login_hint="Run kang-eyes login boss; complete login yourself in the dedicated browser.")
         except ReachError as exc:
             # Upstream's detector also matches hidden login components on readable
             # job pages. Its message alone cannot establish an expired session.

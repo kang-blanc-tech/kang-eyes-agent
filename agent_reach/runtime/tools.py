@@ -1,4 +1,4 @@
-"""Upstream tools and machine prerequisites Agent Reach installs, at their declared versions.
+"""Upstream tools and machine prerequisites Kang Eyes Agent installs, at their declared versions.
 
 Tools with `tested` are installed at that version, and `update` keeps them there. Each tool may set `floor`
 (oldest version we accept) and `exclude` (known-bad versions, added in a release when an upstream breaks);
@@ -6,12 +6,12 @@ tools without `tested` use the newest version inside those limits. Existing user
 state.json records the version actually installed.
 
 Kinds:
-- pip / npm: private, under ~/.agent-reach/tools/<name>/ (own venv or npm
+- pip / npm: private, under ~/.kang-eyes/tools/<name>/ (own venv or npm
   prefix). Never on the user's PATH; the user's own copy, if any, is untouched.
 - singleton (npm): can only exist once per machine (OpenCLI owns a fixed daemon
   port and a Chrome extension). A user copy inside the limits is used as is; an
   out-of-limits user copy is upgraded only with explicit consent; when missing
-  it is installed into ~/.agent-reach/tools/npm-global/ and recorded as ours.
+  it is installed into ~/.kang-eyes/tools/npm-global/ and recorded as ours.
 - prerequisites (node, uv, ffmpeg, chrome): the system copy is used when there
   is one; otherwise a private copy is installed without an admin password.
 """
@@ -33,7 +33,7 @@ from typing import Dict, Iterable, List, Optional, Set, Tuple
 from . import state
 from .result import NEED_SETUP, TIMEOUT, UPSTREAM_BROKEN, ReachError, _clean
 
-OURS = "agent-reach"
+OURS = "kang-eyes"
 
 
 @dataclass(frozen=True)
@@ -307,7 +307,7 @@ def _download(url: str, dest: Path, timeout: float = 600) -> None:
     proxy = _install_env().get("HTTPS_PROXY")
     handlers = [urllib.request.ProxyHandler({"https": proxy, "http": proxy})] if proxy else []
     opener = urllib.request.build_opener(*handlers)
-    req = urllib.request.Request(url, headers={"User-Agent": "agent-reach"})
+    req = urllib.request.Request(url, headers={"User-Agent": "kang-eyes"})
     try:
         with opener.open(req, timeout=timeout) as resp, open(dest, "wb") as fh:
             shutil.copyfileobj(resp, fh, 1024 * 1024)
@@ -340,7 +340,7 @@ def _install_pip(tool: Tool) -> None:
 def _npm_cmd() -> str:
     npm = resolve("npm")
     if not npm:
-        raise ReachError(NEED_SETUP, "npm is not installed", hint="Run `agent-reach add <channel>` again.")
+        raise ReachError(NEED_SETUP, "npm is not installed", hint="Run `kang-eyes add <channel>` again.")
     return npm
 
 
@@ -539,7 +539,7 @@ def ensure(name: str, *, allow_upgrade: bool = False, upgrade: bool = False) -> 
         _install(tool)
     elif entry.get("version"):
         return {"tool": name, **entry}
-    # fresh install, or a record from an older Agent Reach without a version
+    # fresh install, or a record from an older Kang Eyes Agent without a version
     return record(name, _private_version(tool))
 
 
@@ -622,7 +622,7 @@ def prune(keep: Set[str]) -> List[str]:
 
 
 def uninstall_global_owned(dry_run: bool) -> list:
-    """Global singletons we installed (owner agent-reach); uninstall them."""
+    """Global singletons we installed (owner kang-eyes); uninstall them."""
     out = []
     for name, entry in state.load()["tools"].items():
         desc = _uninstall_global(name, entry, dry_run)

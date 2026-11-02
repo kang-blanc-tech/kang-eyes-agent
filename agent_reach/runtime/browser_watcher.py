@@ -1,6 +1,6 @@
-"""Owner and idle watcher of the Agent Reach browser (`python -m agent_reach.runtime.browser_watcher`).
+"""Owner and idle watcher of the Kang Eyes Agent browser (`python -m agent_reach.runtime.browser_watcher`).
 
-Started detached by runtime.browser. Holds ~/.agent-reach/browser/watcher.lock
+Started detached by runtime.browser. Holds ~/.kang-eyes/browser/watcher.lock
 so only one runs.
 
 With --launch --cloak it owns a Cloak persistent context on every OS; otherwise

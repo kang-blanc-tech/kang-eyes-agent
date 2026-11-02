@@ -98,7 +98,7 @@ def _upgrade_lines(result):
     lines = ['**这次是从旧版本（1.5）升级上来的：**', '',
              '- 你的密钥和设置都保留了。',
              '- RSS 订阅和 Exa 全网搜索不再单独提供，搜资料、读网页统一用"网页"。',
-             '- 推特、小红书这类要登录的平台，现在用 Agent Reach 自己的专用浏览器；第一次用时会先尝试复用你 Chrome 里的登录。',
+             '- 推特、小红书这类要登录的平台，现在用 Kang Eyes Agent 自己的专用浏览器；第一次用时会先尝试复用你 Chrome 里的登录。',
              '- 你以前另外装的命令行工具（比如 twitter-cli、bili）原样保留，没有删。']
     suggested = [_DISPLAY_NAMES.get(n, n) for n in migration.get('suggested_channels') or []]
     if suggested:
@@ -124,7 +124,7 @@ def installation_report(result):
     completed = all(row['ok'] for row in installs.values())
     lines = [
         _local_greeting(), '',
-        f"**Agent Reach {result['version']} {'安装完成' if completed else '安装还差一步'}。** "
+        f"**Kang Eyes Agent {result['version']} {'安装完成' if completed else '安装还差一步'}。** "
         f'默认功能：{installed}/{len(installs)} 项准备成功。', '',
         *_upgrade_lines(result),
         '✅ 不用登录；❌ 登录后再试；🔑 需 Key；— 不用额外登录。', '',

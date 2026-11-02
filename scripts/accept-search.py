@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--cli', default='agent-reach')
+parser.add_argument('--cli', default='kang-eyes')
 parser.add_argument('--out', type=Path, required=True)
 parser.add_argument('--channels', nargs='+', default=['github','twitter','youtube','bilibili','xiaohongshu','linkedin','boss','xueqiu','web'])
 args = parser.parse_args()

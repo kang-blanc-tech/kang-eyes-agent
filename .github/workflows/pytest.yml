@@ -106,8 +106,8 @@ jobs:
         run: |
           python -m venv /tmp/smoke
           /tmp/smoke/bin/pip install --quiet dist/*.whl
-          /tmp/smoke/bin/agent-reach version
-          cd /tmp && /tmp/smoke/bin/agent-reach channels | /tmp/smoke/bin/python -c "import json, sys; d = json.load(sys.stdin); assert d['ok'] and d['channels'], d; print(f\"channels OK: {len(d['channels'])}\")"
+          /tmp/smoke/bin/kang-eyes version
+          cd /tmp && /tmp/smoke/bin/kang-eyes channels | /tmp/smoke/bin/python -c "import json, sys; d = json.load(sys.stdin); assert d['ok'] and d['channels'], d; print(f\"channels OK: {len(d['channels'])}\")"
           cd /tmp && /tmp/smoke/bin/python -c "import agent_reach; from importlib.resources import files; assert (files('agent_reach')/'skill'/'SKILL.md').is_file(); print('SKILL.md ships in site-packages OK')"
 
   # Most users are on 1.5 (installed with pipx). Rehearse the documented
@@ -139,20 +139,20 @@ jobs:
 
       - name: Install 1.5 the way its install guide said (pipx)
         run: |
-          git fetch --tags --force https://github.com/Panniantong/Agent-Reach.git 'refs/tags/v1.5.0:refs/tags/v1.5.0' || true
+          git fetch --tags --force https://github.com/kang-blanc-tech/kang-eyes-agent.git 'refs/tags/v1.5.0:refs/tags/v1.5.0' || true
           git worktree add ../v15 v1.5.0
           python -m pip install --quiet pipx
           python -m pipx install --python "$(python -c 'import sys;print(sys.executable)')" ../v15
           echo "$(python -m pipx environment --value PIPX_BIN_DIR)" >> "$GITHUB_PATH"
           python - <<'PY'
           from pathlib import Path
-          d = Path.home() / ".agent-reach"; d.mkdir(exist_ok=True)
+          d = Path.home() / ".kang-eyes"; d.mkdir(exist_ok=True)
           (d / "config.yaml").write_text("groq_api_key: test\ntwitter_auth_token: t\n")
           PY
 
       - name: Old version is 1.5
         run: |
-          v="$(agent-reach version)"; echo "$v"
+          v="$(kang-eyes version)"; echo "$v"
           echo "$v" | grep -q "v1.5"
 
       - name: Upgrade as docs/install.md says
@@ -162,9 +162,9 @@ jobs:
 
       - name: New copy wins, sets up, removes the old one
         run: |
-          v="$(agent-reach version)"; echo "$v"
+          v="$(kang-eyes version)"; echo "$v"
           echo "$v" | grep -q '"install_method": "uv"'
-          agent-reach setup > setup.json || true
+          kang-eyes setup > setup.json || true
           python - <<'PY'
           import json
           d = json.loads(open("setup.json", encoding="utf-8").read().strip().split("\n")[-1])
@@ -175,5 +175,5 @@ jobs:
           assert "1.5" in r["installation_report"]["markdown"]
           print("upgrade OK:", r["old_copies"])
           PY
-          if python -m pipx list --short | grep -q agent-reach; then echo "old pipx copy still registered"; exit 1; fi
-          agent-reach version | grep -q '"install_method": "uv"'
+          if python -m pipx list --short | grep -q kang-eyes; then echo "old pipx copy still registered"; exit 1; fi
+          kang-eyes version | grep -q '"install_method": "uv"'

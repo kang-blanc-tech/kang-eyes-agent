@@ -1,15 +1,15 @@
-"""~/.agent-reach/state.json: which channels are added, which tools we installed, last checks.
+"""~/.kang-eyes/state.json: which channels are added, which tools we installed, last checks.
 
     {
       "version": 1,
       "channels": {"bilibili": {"added_at": "..."}},
       "removed_defaults": ["youtube"],
-      "tools": {"bili-cli": {"owner": "agent-reach" | "user", "scope": "private" | "global", "version": "0.6.2"}},
+      "tools": {"bili-cli": {"owner": "kang-eyes" | "user", "scope": "private" | "global", "version": "0.6.2"}},
       "checks": {"bilibili": {"at": "...", "actions": {"search": true}, "previous": {"search": true}}},
       "skill": {"links": [{"agent": "claude-code", "path": "...", "kind": "link" | "copy"}]}
     }
 
-`owner` decides what remove/sync/uninstall may delete: only "agent-reach" entries.
+`owner` decides what remove/sync/uninstall may delete: only "kang-eyes" entries.
 `version` is the version actually installed (tools are not pinned).
 `removed_defaults` are default channels the user removed; setup and update leave them out.
 `skill.links` are the skill links/copies we made; update refreshes them, uninstall removes them.
@@ -36,7 +36,7 @@ T = TypeVar("T")
 
 
 def root() -> Path:
-    return home_dir() / ".agent-reach"
+    return home_dir() / ".kang-eyes"
 
 
 def state_path() -> Path:

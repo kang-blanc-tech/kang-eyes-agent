@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Configuration management for Agent Reach.
+"""Configuration management for Kang Eyes Agent.
 
-Stores settings in ~/.agent-reach/config.yaml. Reads never create files or
+Stores settings in ~/.kang-eyes/config.yaml. Reads never create files or
 directories; the private directory is created only on the first write.
 """
 
@@ -98,9 +98,9 @@ def _atomic_write_yaml(target: Path, data: dict) -> None:
 
 
 class Config:
-    """Manages Agent Reach configuration."""
+    """Manages Kang Eyes Agent configuration."""
 
-    CONFIG_DIR = home_dir() / ".agent-reach"
+    CONFIG_DIR = home_dir() / ".kang-eyes"
     CONFIG_FILE = CONFIG_DIR / "config.yaml"
 
 
@@ -147,7 +147,7 @@ class Config:
         if self.read_only:
             raise ConfigReadOnlyError("当前配置是只读的，不能保存")
         self._ensure_dir()
-        if self.config_path == home_dir() / ".agent-reach" / "config.yaml":
+        if self.config_path == home_dir() / ".kang-eyes" / "config.yaml":
             from agent_reach.runtime import state
             state.remember_path(self.config_path, "configuration")
         _atomic_write_yaml(self.config_path, self.data)

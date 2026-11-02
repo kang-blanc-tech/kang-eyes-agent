@@ -7,7 +7,7 @@ from agent_reach.runtime.result import BAD_INPUT, NOT_FOUND, UPSTREAM_BROKEN, Re
 from .base import Action, Channel, Param
 
 _XHS_LOGIN_HINT = (
-    "Run agent-reach login xiaohongshu to open the Agent Reach dedicated browser. "
+    "Run kang-eyes login xiaohongshu to open the Kang Eyes Agent dedicated browser. "
     "Reach first tries the existing local site login; the user completes any remaining login. Never ask for a password."
 )
 

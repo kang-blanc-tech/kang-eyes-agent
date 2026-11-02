@@ -23,7 +23,7 @@ def test_channel_registry_contract():
 
 def test_channel_can_handle_contract():
     url_samples = {
-        "github": "https://github.com/panniantong/agent-reach",
+        "github": "https://github.com/panniantong/kang-eyes",
         "twitter": "https://x.com/user/status/1",
         "youtube": "https://youtube.com/watch?v=abc",
         "reddit": "https://reddit.com/r/python",

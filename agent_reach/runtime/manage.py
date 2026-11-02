@@ -113,7 +113,7 @@ def channel_tools(ch) -> List[str]:
 
 
 def site_domains(ch) -> List[str]:
-    """Cookie domains of the channel's site in the Agent Reach browser."""
+    """Cookie domains of the channel's site in the Kang Eyes Agent browser."""
     if getattr(ch, "domains", ()):
         return list(ch.domains)
     host = (urlparse(ch.login_url).hostname or "").lower()
@@ -127,14 +127,14 @@ def _has_login(ch) -> bool:
 
 
 def browser_login_next(ch) -> str:
-    """The single sentence for the user after the login page opened in the Agent Reach browser."""
+    """The single sentence for the user after the login page opened in the Kang Eyes Agent browser."""
     from agent_reach.channels.base import Channel
 
     needs_sync = bool(ch.session) or type(ch).sync_login is not Channel.sync_login
     if needs_sync:
-        return (f"The user logs in to {ch.name} in the Agent Reach browser window that just opened; "
-                f"then run `agent-reach login {ch.name} --sync`.")
-    return f"The user logs in to {ch.name} in the Agent Reach browser window that just opened; then retry the action."
+        return (f"The user logs in to {ch.name} in the Kang Eyes Agent browser window that just opened; "
+                f"then run `kang-eyes login {ch.name} --sync`.")
+    return f"The user logs in to {ch.name} in the Kang Eyes Agent browser window that just opened; then retry the action."
 
 # ── checks ──
 
@@ -216,8 +216,8 @@ def regressed(check: Optional[dict]) -> bool:
 
 def channel_status(ch, data: dict) -> dict:
     if not is_added(ch, data):
-        return {"status": "not_added", "problems": [], "hint": f"agent-reach add {ch.name}"}
-    problems = [f"{t} not installed: run `agent-reach add {ch.name}`" for t in channel_tools(ch) if not tools.present(t)]
+        return {"status": "not_added", "problems": [], "hint": f"kang-eyes add {ch.name}"}
+    problems = [f"{t} not installed: run `kang-eyes add {ch.name}`" for t in channel_tools(ch) if not tools.present(t)]
     problems += ch.setup_problems()
     if problems:
         return {"status": "needs_setup", "problems": problems}
@@ -230,7 +230,7 @@ def channel_status(ch, data: dict) -> dict:
             codes = check.get("codes", {})
             if all(codes.get(a) == "NEED_LOGIN" for a in failed):
                 return {"status": "needs_login", "problems": [f"needs login for: {', '.join(failed)}"],
-                        "hint": f"agent-reach login {ch.name}", "checked_at": check["at"]}
+                        "hint": f"kang-eyes login {ch.name}", "checked_at": check["at"]}
             if all(codes.get(a) == "RATE_LIMITED" for a in failed):
                 return {"status": "cooldown", "problems": [f"rate limited: {', '.join(failed)}"],
                         "checked_at": check["at"]}
@@ -240,7 +240,7 @@ def channel_status(ch, data: dict) -> dict:
             return {"status": "broken", "problems": [f"live check failed: {', '.join(failed)}"], "checked_at": check["at"]}
         return {"status": "search_ready" if check.get("scope") == "search" else "ready", "problems": [],
                 "checked_at": check["at"], "verified_actions": list(actions)}
-    return {"status": "unverified", "problems": [], "hint": f"agent-reach check {ch.name}"}
+    return {"status": "unverified", "problems": [], "hint": f"kang-eyes check {ch.name}"}
 
 
 def doctor() -> dict:
@@ -281,7 +281,7 @@ def _next_step(ch) -> Optional[str]:
     """Tools are prepared; actual access decides whether login is needed."""
     if ch.login_url or ch.login_argv:
         return ("Use existing public tools when they cover the task. "
-                f"If access requires login, run agent-reach login {ch.name} "
+                f"If access requires login, run kang-eyes login {ch.name} "
                 "to open the shared dedicated browser or native login flow.")
     return " ".join(_sentence(p) for p in ch.setup_problems()) or None
 
@@ -359,12 +359,12 @@ def remove(name: str) -> dict:
 
 # ── skill (the agent-facing instructions) ──
 #
-# One real copy in ~/.agents/skills/agent-reach (read natively by Codex, OpenCode,
+# One real copy in ~/.agents/skills/kang-eyes (read natively by Codex, OpenCode,
 # Cline, Warp, Zed). AIs that do not read that folder get a symlink in their own
 # skills folder, but only when their config folder exists. Source for the folders:
 # the vercel-labs/skills supported-agents table.
 
-SKILL_NAME = "agent-reach"
+SKILL_NAME = "kang-eyes"
 
 
 def _openclaw_home() -> Path:
@@ -409,7 +409,7 @@ def _skill_lang() -> str:
         v = os.environ.get(var, "").strip().lower()
         if v.startswith("en"):
             return "en"
-    return "zh"
+    return "en"   # Kang Eyes Agent: English unless the environment asks otherwise (upstream: "zh")
 
 
 def render_skill(lang: Optional[str] = None) -> str:
@@ -420,7 +420,7 @@ def render_skill(lang: Optional[str] = None) -> str:
     labels = {"default": "default", "optional": "optional", "experimental": "experimental"}
     rows = ["| channel | level | actions | login |", "|---|---|---|---|"]
     for ch in _channels():
-        login = f"`agent-reach login {ch.name}`" if _has_login(ch) else "-"
+        login = f"`kang-eyes login {ch.name}`" if _has_login(ch) else "-"
         if ch.name == "reddit":
             login = "浏览器路径按需" if lang == "zh" else "Browser path only, if required"
         rows.append(f"| {ch.name} | {labels[ch.level]} | {', '.join(a.name for a in ch.actions)} | {login} |")
@@ -428,7 +428,7 @@ def render_skill(lang: Optional[str] = None) -> str:
 
 
 def _is_our_copy(path: Path) -> bool:
-    """A real folder holding our SKILL.md (frontmatter `name: agent-reach`)."""
+    """A real folder holding our SKILL.md (frontmatter `name: kang-eyes`)."""
     if path.is_symlink() or not path.is_dir():
         return False
     try:
@@ -489,7 +489,7 @@ def _write_copy(target: Path, text: str) -> None:
 
 
 def _link_into(skills_dir: Path, text: str) -> tuple:
-    """Make `<skills_dir>/agent-reach` point at the real copy.
+    """Make `<skills_dir>/kang-eyes` point at the real copy.
 
     Returns (kind, reason): kind is "link" | "copy" | None (left alone; reason says why).
     Our own old real copy is replaced; anything else already there is left untouched.
@@ -501,7 +501,7 @@ def _link_into(skills_dir: Path, text: str) -> tuple:
         return None, f"a symlink to {os.readlink(target)} is already there"
     if target.exists():
         if not _is_our_copy(target):
-            return None, "a different skill named agent-reach is already there"
+            return None, "a different skill named kang-eyes is already there"
         _write_copy(target, text)
         return "copy", None
     skills_dir.mkdir(parents=True, exist_ok=True)
@@ -565,7 +565,7 @@ def link_skill(skills_dir: str) -> dict:
         target_dir = Path.cwd() / target_dir
     if target_dir.name == SKILL_NAME:
         raise ReachError(BAD_INPUT, f"give the skills folder, not the {SKILL_NAME} folder inside it",
-                         hint=f"agent-reach skill link {target_dir.parent}")
+                         hint=f"kang-eyes skill link {target_dir.parent}")
     if os.path.realpath(target_dir) == os.path.realpath(skill_dir().parent):
         return skill_status()
     text = render_skill()
@@ -614,7 +614,7 @@ RETIRED_CHANNELS = ("rss", "exa_search")
 
 
 def migrate() -> dict:
-    """First run after an older Agent Reach: create state, keep credentials, suggest channels.
+    """First run after an older Kang Eyes Agent: create state, keep credentials, suggest channels.
 
     The result is kept in state so the first install report can explain the upgrade even
     when another process (the new uv copy) renders it.
@@ -627,7 +627,7 @@ def migrate() -> dict:
     defaults = {c.name for c in _channels() if c.level == "default"}
     result = {
         "migrated": True,
-        "kept": "~/.agent-reach/config.yaml (keys and cookies unchanged)",
+        "kept": "~/.kang-eyes/config.yaml (keys and cookies unchanged)",
         "suggested_channels": sorted(hints - defaults),
         "retired_channels": list(RETIRED_CHANNELS),
         "note": "Your own global tools were not removed. Browser login must be completed by the user in the Reach dedicated window.",
@@ -640,7 +640,7 @@ def migrate() -> dict:
 
 
 def _cleanup_old_copies() -> dict:
-    """From the uv install, remove 1.5 copies (pipx / ~/.agent-reach-venv) so they cannot shadow it."""
+    """From the uv install, remove 1.5 copies (pipx / ~/.kang-eyes-venv) so they cannot shadow it."""
     if install_method() != "uv":
         return {"removed": [], "failed": []}
     from . import legacy
@@ -649,14 +649,14 @@ def _cleanup_old_copies() -> dict:
 
 def _old_copy_actions(old: dict) -> List[str]:
     from . import legacy
-    return [f"An old Agent Reach copy could not be removed ({i['path']}); run `{legacy.manual_command(i)}`."
+    return [f"An old Kang Eyes Agent copy could not be removed ({i['path']}); run `{legacy.manual_command(i)}`."
             for i in old["failed"]]
 
 
 def _optional_entry(c) -> dict:
     """What the user must do for an optional channel; installs happen by themselves."""
     needs = (["login_if_required"] if (c.login_url or c.login_argv) else []) + ([c.needs_key] if c.needs_key else [])
-    return {"channel": c.name, "level": c.level, "add": f"agent-reach add {c.name}", "needs": needs}
+    return {"channel": c.name, "level": c.level, "add": f"kang-eyes add {c.name}", "needs": needs}
 
 
 def setup() -> dict:
@@ -693,7 +693,7 @@ def setup() -> dict:
         "default_channels": added,
         "skill": skill,
         "optional_channels": optional,
-        "logins": [{"channel": c.name, "command": f"agent-reach login {c.name}",
+        "logins": [{"channel": c.name, "command": f"kang-eyes login {c.name}",
                     "when": "only_if_required"} for c in defaults if _has_login(c)],
         "capability_summary": capability_summary(registered, current),
         "migration": migration,
@@ -718,7 +718,7 @@ def setup() -> dict:
 def _retired_mcp_notice() -> list:
     """Read the old ledger only; never edit another application's configuration."""
     if state.load().get("mcp"):
-        return ["An older Reach build registered an MCP server. Remove the agent-reach entry in your AI application's MCP settings; Reach no longer edits those settings."]
+        return ["An older Reach build registered an MCP server. Remove the kang-eyes entry in your AI application's MCP settings; Reach no longer edits those settings."]
     return []
 
 
@@ -743,11 +743,11 @@ def update_check() -> dict:
 
 
 def install_method() -> str:
-    """How this copy of Agent Reach was installed: uv | editable | other."""
+    """How this copy of Kang Eyes Agent was installed: uv | editable | other."""
     try:
         from importlib.metadata import distribution
 
-        direct = distribution("agent-reach").read_text("direct_url.json") or "{}"
+        direct = distribution("kang-eyes").read_text("direct_url.json") or "{}"
         if json.loads(direct).get("dir_info", {}).get("editable"):
             return "editable"
     except Exception:  # noqa: BLE001
@@ -765,7 +765,7 @@ def upgrade_command(version: str) -> List[str]:
     return ["uv", "tool", "install", "--force", _source(version)]
 
 
-UNINSTALL_PROGRAM = "uv tool uninstall agent-reach"
+UNINSTALL_PROGRAM = "uv tool uninstall kang-eyes"
 
 
 def _ordered_tools(names) -> List[str]:
@@ -799,7 +799,7 @@ def sync() -> dict:
         data["checks"].pop(n, None)
     data["removed_defaults"] = [n for n in data["removed_defaults"] if n in known]
     state.save(data)
-    actions = [f"The {n} channel is no longer part of Agent Reach and was removed." for n in dropped]
+    actions = [f"The {n} channel is no longer part of Kang Eyes Agent and was removed." for n in dropped]
     added = [c for c in _channels() if is_added(c, data)]
     synced, problems, failed = [], [], set()
     for t in _ordered_tools(t for c in added for t in channel_tools(c)):
@@ -823,7 +823,7 @@ def sync() -> dict:
         previous = check.get("previous") or {}
         expired = [a for a, code in (check.get("codes") or {}).items() if code == "NEED_LOGIN" and previous.get(a)]
         if expired:
-            actions.append(f"The user needs to log in to {c.name} again: run `agent-reach login {c.name}`.")
+            actions.append(f"The user needs to log in to {c.name} again: run `kang-eyes login {c.name}`.")
     old_copies = _cleanup_old_copies()
     actions += _old_copy_actions(old_copies)
     return {"version": __version__, "tools": synced, "problems": problems, "removed_tools": _prune(state.load()),
@@ -851,7 +851,7 @@ def _move_to_uv(info: dict) -> dict:
         raise ReachError(UPSTREAM_BROKEN, f"upgrade failed: {proc.stderr.strip()[-300:]}",
                          hint=f"Run manually: {' '.join(cmd)}")
     bin_dir = subprocess.run([uv, "tool", "dir", "--bin"], capture_output=True, text=True, timeout=60).stdout.strip()
-    exe = Path(bin_dir) / ("agent-reach.exe" if os.name == "nt" else "agent-reach")
+    exe = Path(bin_dir) / ("kang-eyes.exe" if os.name == "nt" else "kang-eyes")
     child = [str(exe), "setup"] if fresh else [str(exe), "update", "--sync-only"]
     out = subprocess.run(child, capture_output=True, text=True, timeout=1800)
     try:
@@ -861,20 +861,20 @@ def _move_to_uv(info: dict) -> dict:
     actions = list(result.get("user_actions") or [])
     package = Path(__file__).resolve().parents[1]
     if package.exists():  # a copy the new one does not know about (pip --user, conda, ...)
-        gone = subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "-q", "agent-reach"],
+        gone = subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "-q", "kang-eyes"],
                               capture_output=True, timeout=120).returncode == 0
         if not gone:
-            actions.append(f"Remove the old Agent Reach copy: `{sys.executable} -m pip uninstall agent-reach`.")
-    found = shutil.which("agent-reach")
+            actions.append(f"Remove the old Kang Eyes Agent copy: `{sys.executable} -m pip uninstall kang-eyes`.")
+    found = shutil.which("kang-eyes")
     if not found or os.path.realpath(found) != os.path.realpath(exe):
-        actions.append("Open a new terminal so `agent-reach` runs the new version; if it still does not, "
+        actions.append("Open a new terminal so `kang-eyes` runs the new version; if it still does not, "
                        f"run `{uv} tool update-shell`.")
     return {**info, "upgraded": True, "method": "moved_to_uv", "sync": result,
             "installation_report": result.get("installation_report"), "user_actions": actions}
 
 
 def update(check_only: bool = False) -> dict:
-    """Upgrade Agent Reach when a release is newer, then upgrade every added channel's tools."""
+    """Upgrade Kang Eyes Agent when a release is newer, then upgrade every added channel's tools."""
     info = update_check()
     if check_only:
         return info
@@ -892,7 +892,7 @@ def update(check_only: bool = False) -> dict:
         if proc.returncode != 0:
             raise ReachError(UPSTREAM_BROKEN, f"upgrade failed: {proc.stderr.strip()[-300:]}",
                              hint=f"Run manually: {' '.join(cmd)}")
-        exe = shutil.which("agent-reach") or sys.argv[0]
+        exe = shutil.which("kang-eyes") or sys.argv[0]
         out = subprocess.run([exe, "update", "--sync-only"], capture_output=True, text=True, timeout=1800)
         try:
             synced = json.loads(out.stdout.strip().split("\n")[-1]).get("result") or {}

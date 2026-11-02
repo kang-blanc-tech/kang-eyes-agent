@@ -16,7 +16,7 @@ from agent_reach.utils.process import utf8_subprocess_env
 
 from .base import Action, Channel, Param
 
-_UA = "agent-reach/1.0"
+_UA = "kang-eyes/1.0"
 _TIMEOUT = 10
 _MAX_RESPONSE_BYTES = 1024 * 1024
 _API_BASE = "https://www.v2ex.com"

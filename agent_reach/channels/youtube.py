@@ -28,7 +28,7 @@ _RAW_KEYS = ("id", "duration", "view_count", "like_count", "channel_id", "tags",
 
 
 def _ytdlp_argv(*args: str) -> list:
-    """Run the yt-dlp installed with Agent Reach (one of its dependencies)."""
+    """Run the yt-dlp installed with Kang Eyes Agent (one of its dependencies)."""
     runtime = []
     if shutil.which("deno") is None and shutil.which("node"):
         runtime = ["--js-runtimes", "node"]
@@ -119,7 +119,7 @@ class YouTubeChannel(Channel):
             "Full subtitle text of a video (manual or auto captions)",
             (
                 Param("target", "video link or id"),
-                Param("lang", "preferred languages, comma separated", required=False, default="zh-Hans,zh,en,en-orig"),
+                Param("lang", "preferred languages, comma separated", required=False, default="en,en-orig,zh-Hans,zh"),
             ),
             (("yt-dlp", "_ytdlp_subtitle"),),
             live_test={"target": "https://www.youtube.com/watch?v=jNQXAC9IVRw"},
@@ -176,7 +176,7 @@ class YouTubeChannel(Channel):
     def _ytdlp_subtitle(self, *, target: str, lang: str, timeout: float) -> list:
         url = _video_url(target)
         wanted = [x.strip() for x in lang.split(",") if x.strip()]
-        with private_temporary_directory(prefix="agent-reach-subs-") as tmp:
+        with private_temporary_directory(prefix="kang-eyes-subs-") as tmp:
             out = _run_ytdlp(
                 [
                     "--skip-download", "--no-simulate",
@@ -214,7 +214,7 @@ class YouTubeChannel(Channel):
         except NoProviderConfigured:
             raise ReachError(
                 "NEED_SETUP", "no Whisper API key configured",
-                hint="Ask the user for a free key from https://console.groq.com, then run `agent-reach configure groq-key`.",
+                hint="Ask the user for a free key from https://console.groq.com, then run `kang-eyes configure groq-key`.",
             ) from None
         except TranscribeError as exc:
             raise ReachError("UPSTREAM_BROKEN", str(exc)[:300]) from None

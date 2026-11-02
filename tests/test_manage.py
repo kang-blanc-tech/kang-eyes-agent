@@ -154,7 +154,7 @@ def test_private_copy_wins_over_path(env):
 
 
 def test_install_records_the_installed_version_and_upgrade_reinstalls(env):
-    assert tools.ensure("bili-cli") == {"tool": "bili-cli", "owner": "agent-reach", "scope": "private",
+    assert tools.ensure("bili-cli") == {"tool": "bili-cli", "owner": "kang-eyes", "scope": "private",
                                          "version": "1.2.3"}
     tools.ensure("bili-cli")
     assert env["installs"] == ["bili-cli"], "an installed tool is not reinstalled by add"
@@ -167,7 +167,7 @@ def test_install_records_the_installed_version_and_upgrade_reinstalls(env):
 def test_old_record_without_version_gets_one_without_reinstall(env):
     tools.ensure("bili-cli")
     data = state.load()
-    data["tools"]["bili-cli"] = {"spec": "bilibili-cli==0.6.2", "owner": "agent-reach", "scope": "private"}
+    data["tools"]["bili-cli"] = {"spec": "bilibili-cli==0.6.2", "owner": "kang-eyes", "scope": "private"}
     state.save(data)
     assert tools.ensure("bili-cli")["version"] == "1.2.3"
     assert env["installs"] == ["bili-cli"]
@@ -187,7 +187,7 @@ def test_install_spec_uses_tested_versions_or_floor_and_exclude():
     "user_version, allow, expect_install, expect_owner, expect_version",
     [("1.9.0", False, [], "user", "1.9.0"),
      ("1.8.0", True, [("user-upgrade", "opencli")], "user", "1.9.0"),
-     (None, False, ["opencli"], "agent-reach", "1.8.7")],
+     (None, False, ["opencli"], "kang-eyes", "1.8.7")],
 )
 def test_singleton_reuses_user_copy_and_upgrades_only_with_consent(
     env, user_version, allow, expect_install, expect_owner, expect_version
@@ -225,7 +225,7 @@ def test_add_installs_missing_prerequisite_privately(env):
     out = manage.add("needy")
     assert out["added"] is True and env["installs"] == ["ffmpeg"]
     assert tools.ffmpeg_path() == str(tools._private_bin(tools.TOOLS["ffmpeg"], "ffmpeg"))
-    assert state.load()["tools"]["ffmpeg"] == {"owner": "agent-reach", "scope": "private", "version": "1.2.3"}
+    assert state.load()["tools"]["ffmpeg"] == {"owner": "kang-eyes", "scope": "private", "version": "1.2.3"}
     assert "needy" in state.load()["channels"]
 
 
@@ -239,14 +239,14 @@ def test_npm_tool_gets_private_node_first(env):
     out = manage.add("linky")
     assert env["installs"] == ["node", "mcporter"]
     assert {t: e["version"] for t, e in state.load()["tools"].items()} == {"node": "1.2.3", "mcporter": "1.2.3"}
-    assert "agent-reach login linky" in out["next"]
+    assert "kang-eyes login linky" in out["next"]
 
 
 def test_browser_channel_add_never_opens_login_and_explicit_dedicated_remove_cleans_up(env):
     out = manage.add("site")
     assert "ensure_chrome" in env["calls"]
     assert env["calls"] == ["ensure_chrome", "setup"]
-    assert "If access requires login" in out["next"] and "agent-reach login site" in out["next"]
+    assert "If access requires login" in out["next"] and "kang-eyes login site" in out["next"]
     assert out["capability_summary"]["channels"][0]["reach_status"] == "unverified"
     manage.add("site2")
     browser.profile_dir().mkdir(parents=True)
@@ -293,7 +293,7 @@ def test_default_channel_can_be_removed_and_stays_removed(env):
 def test_sync_upgrades_prunes_drops_and_reports(env):
     manage.add("bili")
     data = state.load()
-    data["tools"]["old-tool"] = {"owner": "agent-reach", "scope": "private", "version": "0.1.0"}
+    data["tools"]["old-tool"] = {"owner": "kang-eyes", "scope": "private", "version": "0.1.0"}
     data["tools"]["user-thing"] = {"owner": "user", "scope": "global", "version": "1.0.0"}
     data["channels"]["xiaoyuzhou"] = {"added_at": "2026-01-01T00:00:00Z"}
     data["checks"]["bili"] = {"at": state.now(), "actions": {"search": False}, "codes": {"search": "NEED_LOGIN"},
@@ -346,7 +346,7 @@ def test_update_from_a_non_uv_install_moves_itself_to_uv(env, monkeypatch, tmp_p
         def __init__(self, stdout=""):
             self.returncode, self.stdout, self.stderr = 0, stdout, ""
 
-    exe = tmp_path / ("agent-reach.exe" if os.name == "nt" else "agent-reach")
+    exe = tmp_path / ("kang-eyes.exe" if os.name == "nt" else "kang-eyes")
 
     def run(cmd, **kw):
         calls.append(cmd)
@@ -380,7 +380,7 @@ def test_upgrade_report_explains_the_move_from_1_5():
     text = "\n".join(onboarding._upgrade_lines({
         "migration": {"suggested_channels": ["twitter"]},
         "old_copies": {"removed": [], "failed": [{"kind": "pipx", "path": "/x"}]}}))
-    assert "1.5" in text and "X / Twitter" in text and "pipx uninstall agent-reach" in text
+    assert "1.5" in text and "X / Twitter" in text and "pipx uninstall kang-eyes" in text
 
 
 def _old_venv(root):
@@ -395,18 +395,18 @@ def test_old_pipx_copy_and_its_launcher_are_removed(monkeypatch, tmp_path):
     monkeypatch.delenv("PIPX_HOME", raising=False)
     monkeypatch.delenv("PIPX_BIN_DIR", raising=False)
     monkeypatch.setattr(legacy, "_pipx_reported_venvs", lambda: "")
-    venv = _old_venv(tmp_path / ".local" / "pipx" / "venvs" / "agent-reach")
+    venv = _old_venv(tmp_path / ".local" / "pipx" / "venvs" / "kang-eyes")
     (venv / "bin").mkdir()
-    (venv / "bin" / "agent-reach").write_text("")
-    shim = tmp_path / ".local" / "bin" / "agent-reach"
+    (venv / "bin" / "kang-eyes").write_text("")
+    shim = tmp_path / ".local" / "bin" / "kang-eyes"
     shim.parent.mkdir(parents=True)
     if os.name != "nt":  # pipx links its launcher on macOS/Linux; on Windows uv overwrites the copy
-        shim.symlink_to(venv / "bin" / "agent-reach")
-    (tmp_path / ".agent-reach-venv").mkdir()  # a venv without Agent Reach is not ours to touch
+        shim.symlink_to(venv / "bin" / "kang-eyes")
+    (tmp_path / ".kang-eyes-venv").mkdir()  # a venv without Kang Eyes Agent is not ours to touch
     assert [i["kind"] for i in legacy.find()] == ["pipx"]
     out = legacy.remove()
     assert len(out["removed"]) == 1 and not venv.exists() and not shim.is_symlink()
-    assert (tmp_path / ".agent-reach-venv").is_dir()
+    assert (tmp_path / ".kang-eyes-venv").is_dir()
 
 
 def test_old_shared_venv_only_loses_agent_reach(monkeypatch, tmp_path):
@@ -414,13 +414,13 @@ def test_old_shared_venv_only_loses_agent_reach(monkeypatch, tmp_path):
     monkeypatch.setattr(legacy, "_pipx_reported_venvs", lambda: "")
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.delenv("PIPX_HOME", raising=False)
-    venv = _old_venv(tmp_path / ".agent-reach-venv")
+    venv = _old_venv(tmp_path / ".kang-eyes-venv")
     ran = []
     monkeypatch.setattr(legacy.subprocess, "run",
                         lambda cmd, **k: ran.append(cmd) or type("P", (), {"returncode": 0})())
     out = legacy.remove()
     assert len(out["removed"]) == 1 and venv.is_dir()  # the venv stays; only the package is uninstalled
-    assert ran[0][-4:] == ["uninstall", "-y", "-q", "agent-reach"]
+    assert ran[0][-4:] == ["uninstall", "-y", "-q", "kang-eyes"]
 
 
 def test_update_without_new_release_still_upgrades_tools(env, monkeypatch):
@@ -500,7 +500,7 @@ def test_doctor_states(env):
 
 def test_doctor_reports_missing_tool_and_shows_versions(env):
     manage.add("bili")
-    assert {"tool": "bili-cli", "owner": "agent-reach", "scope": "private", "version": "1.2.3"} in manage.doctor()["tools"]
+    assert {"tool": "bili-cli", "owner": "kang-eyes", "scope": "private", "version": "1.2.3"} in manage.doctor()["tools"]
     tools.remove_private("bili-cli")
     assert _status("bili") == "needs_setup"
 
@@ -553,7 +553,7 @@ def test_setup_adds_default_channels_and_survives_a_failing_install(env, monkeyp
     assert by_name["web"]["ok"] is True
     assert by_name["broken"]["ok"] is False and by_name["broken"]["error"]["code"] == "UPSTREAM_BROKEN"
     assert "prerequisites" not in result, "prerequisites are installed, not reported"
-    assert result["logins"] == [{"channel": "broken", "command": "agent-reach login broken",
+    assert result["logins"] == [{"channel": "broken", "command": "kang-eyes login broken",
                                   "when": "only_if_required"}]
     optional = {c["channel"]: c["needs"] for c in result["optional_channels"]}
     assert set(optional) == {"bili", "bili2", "needy", "site", "site2", "linky"}
@@ -645,7 +645,7 @@ def test_skill_lists_every_channel_and_has_no_placeholders(env):
 
 def _seed_our_copy(path):
     path.mkdir(parents=True)
-    (path / "SKILL.md").write_text("---\nname: agent-reach\ndescription: old\n---\nold\n")
+    (path / "SKILL.md").write_text("---\nname: kang-eyes\ndescription: old\n---\nold\n")
     (path / "references").mkdir()
 
 
@@ -654,11 +654,11 @@ def test_skill_one_real_copy_linked_only_for_present_ais(env):
     for d in (".claude", ".codex", ".openclaw"):
         (home / d).mkdir()
     result = manage.place_skill()
-    real = home / ".agents" / "skills" / "agent-reach"
+    real = home / ".agents" / "skills" / "kang-eyes"
     assert (real / "SKILL.md").is_file()
     for name in ("sessions.md", "maintenance.md"):
         assert (real / "references" / name).is_file()
-    for link in (home / ".claude" / "skills" / "agent-reach", home / ".openclaw" / "skills" / "agent-reach"):
+    for link in (home / ".claude" / "skills" / "kang-eyes", home / ".openclaw" / "skills" / "kang-eyes"):
         assert link.is_symlink() and os.path.realpath(link) == os.path.realpath(real)
     assert not (home / ".codex" / "skills").exists(), "codex reads ~/.agents/skills itself"
     assert not (home / ".cursor").exists(), "absent AIs get nothing"
@@ -668,12 +668,12 @@ def test_skill_one_real_copy_linked_only_for_present_ais(env):
 
 def test_skill_replaces_our_old_copy_but_not_a_foreign_one(env):
     home = home_dir()
-    ours = home / ".claude" / "skills" / "agent-reach"
+    ours = home / ".claude" / "skills" / "kang-eyes"
     _seed_our_copy(ours)
-    foreign = home / ".cursor" / "skills" / "agent-reach"
+    foreign = home / ".cursor" / "skills" / "kang-eyes"
     foreign.mkdir(parents=True)
     (foreign / "SKILL.md").write_text("---\nname: someone-else\n---\n")
-    native_old = home / ".codex" / "skills" / "agent-reach"
+    native_old = home / ".codex" / "skills" / "kang-eyes"
     _seed_our_copy(native_old)
     result = manage.place_skill()
     assert ours.is_dir() and not ours.is_symlink()
@@ -691,13 +691,13 @@ def test_skill_falls_back_to_a_copy_without_symlink_rights(env, monkeypatch):
 
     monkeypatch.setattr(type(home), "symlink_to", no_symlinks)
     result = manage.place_skill()
-    copy = home / ".claude" / "skills" / "agent-reach"
+    copy = home / ".claude" / "skills" / "kang-eyes"
     assert not copy.is_symlink() and (copy / "SKILL.md").is_file()
     for name in ("sessions.md", "maintenance.md", "capabilities.md"):
         assert (copy / "references" / name).read_text(encoding="utf-8") == (
             manage.skill_dir() / "references" / name).read_text(encoding="utf-8")
     assert result["copies"] == [str(copy)] and result["links"] == []
-    (copy / "SKILL.md").write_text("---\nname: agent-reach\n---\nstale\n")
+    (copy / "SKILL.md").write_text("---\nname: kang-eyes\n---\nstale\n")
     manage.place_skill()
     assert "stale" not in (copy / "SKILL.md").read_text(encoding="utf-8"), "update refreshes recorded copies"
     manage.uninstall()
@@ -710,16 +710,16 @@ def test_skill_link_for_an_unlisted_ai_and_uninstall_removes_everything(env):
     manage.place_skill()
     other = home / "my-ai" / "skills"
     manage.link_skill(str(other))
-    assert (other / "agent-reach").is_symlink()
+    assert (other / "kang-eyes").is_symlink()
     manage.place_skill()
-    stray = home / ".gemini" / "skills" / "agent-reach"
+    stray = home / ".gemini" / "skills" / "kang-eyes"
     stray.parent.mkdir(parents=True)
-    stray.symlink_to(home / ".agents" / "skills" / "agent-reach")
-    assert (other / "agent-reach").is_symlink(), "update keeps recorded links"
+    stray.symlink_to(home / ".agents" / "skills" / "kang-eyes")
+    assert (other / "kang-eyes").is_symlink(), "update keeps recorded links"
     manage.uninstall()
     assert stray.is_symlink(), "unrecorded shortcut is retained"
-    for p in (other / "agent-reach", home / ".claude" / "skills" / "agent-reach",
-              home / ".agents" / "skills" / "agent-reach"):
+    for p in (other / "kang-eyes", home / ".claude" / "skills" / "kang-eyes",
+              home / ".agents" / "skills" / "kang-eyes"):
         assert not p.exists() and not p.is_symlink()
 
 
@@ -774,18 +774,18 @@ def test_remove_browser_channel_forgets_grants_and_only_its_login(env):
 def test_setup_reports_legacy_mcp_without_editing_external_configuration(env):
     path=home_dir()/".cursor"/"mcp.json"
     path.parent.mkdir()
-    entry={"command":"/test/agent-reach","args":["mcp"]}
-    path.write_text(json.dumps({"mcpServers":{"agent-reach":entry,"keep":{"command":"other"}}}))
+    entry={"command":"/test/kang-eyes","args":["mcp"]}
+    path.write_text(json.dumps({"mcpServers":{"kang-eyes":entry,"keep":{"command":"other"}}}))
     state.mutate(lambda data:data.update(mcp={"cursor":{"path":str(path),"entry":entry}}))
     result = manage.setup()
-    assert json.loads(path.read_text())["mcpServers"]["agent-reach"] == entry
+    assert json.loads(path.read_text())["mcpServers"]["kang-eyes"] == entry
     assert result["user_actions"] and "mcp" in state.load()
 
 
 def test_setup_preserves_unowned_or_changed_mcp_configuration(env):
     path=home_dir()/".cursor"/"mcp.json"
     path.parent.mkdir()
-    original=json.dumps({"mcpServers":{"agent-reach":{"command":"foreign"}}})
+    original=json.dumps({"mcpServers":{"kang-eyes":{"command":"foreign"}}})
     path.write_text(original)
     manage.setup()
     assert path.read_text()==original

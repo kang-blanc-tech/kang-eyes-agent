@@ -75,7 +75,7 @@ _BLOCKED_HOSTS = {
 
 
 def _bin(binary: str) -> str:
-    """Our private copy (e.g. the ffmpeg `agent-reach add` installs) first, then PATH."""
+    """Our private copy (e.g. the ffmpeg `kang-eyes add` installs) first, then PATH."""
     from agent_reach.runtime.tools import resolve
 
     return resolve(binary) or binary
@@ -85,7 +85,7 @@ def _require(binary: str) -> None:
     from agent_reach.runtime.tools import resolve
 
     if not resolve(binary):
-        raise MissingDependency(f"{binary} not found (run `agent-reach add youtube`)")
+        raise MissingDependency(f"{binary} not found (run `kang-eyes add youtube`)")
 
 
 def _require_size_at_most(path: Path, limit: int, label: str) -> int:
@@ -103,7 +103,7 @@ _DURATION_RE = re.compile(r"Duration:\s*(\d+):(\d{2}):(\d{2}(?:\.\d+)?)")
 def _probe_audio_duration(path: Path) -> float:
     """Return duration in seconds or fail closed before media generation.
 
-    Read from `ffmpeg -i` (no ffprobe: the private ffmpeg Agent Reach installs
+    Read from `ffmpeg -i` (no ffprobe: the private ffmpeg Kang Eyes Agent installs
     ships only ffmpeg). Without an output file ffmpeg exits 1 after printing
     the input's details, so the exit code is not checked.
     """
@@ -373,7 +373,7 @@ def transcribe_chunk(
     if not key:
         raise NoProviderConfigured(
             f"{provider}: missing {PROVIDERS[provider]['key_field']} "
-            f"(configure with `agent-reach configure {provider}-key ...`)"
+            f"(configure with `kang-eyes configure {provider}-key ...`)"
         )
 
     info = PROVIDERS[provider]

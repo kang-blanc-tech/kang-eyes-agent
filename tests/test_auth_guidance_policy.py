@@ -57,7 +57,7 @@ def test_public_guidance_never_installs_the_unrelated_pypi_package():
     """The PyPI name is owned by another project; GitHub URLs are required."""
     candidates = _policy_documents()
     bare_install = re.compile(
-        r"\bpip\s+install(?:\s+--upgrade)?\s+['\"]?agent-reach(?:\[[^\]]+\])?\b",
+        r"\bpip\s+install(?:\s+--upgrade)?\s+['\"]?kang-eyes(?:\[[^\]]+\])?\b",
         re.IGNORECASE,
     )
     violations = []
@@ -66,7 +66,7 @@ def test_public_guidance_never_installs_the_unrelated_pypi_package():
             path.read_text(encoding="utf-8").splitlines(), 1
         ):
             if bare_install.search(line) and (
-                "github.com/Panniantong/agent-reach" not in line
+                "github.com/kang-blanc-tech/kang-eyes-agent" not in line
             ):
                 violations.append(
                     f"{path.relative_to(ROOT)}:{line_number}: {line.strip()}"
@@ -78,14 +78,14 @@ def test_public_guidance_never_installs_the_unrelated_pypi_package():
 def test_public_guidance_never_puts_secrets_in_process_arguments():
     """Operational docs should use hidden prompts or stdin for credentials."""
     forbidden = (
-        'agent-reach configure twitter-cookies "',
-        "agent-reach configure twitter-cookies '",
-        'agent-reach configure xhs-cookies "',
-        "agent-reach configure xhs-cookies '",
-        "agent-reach configure groq-key gsk_",
-        "agent-reach configure openai-key sk-",
-        "agent-reach configure github-token gh",
-        "agent-reach configure proxy http",
+        'kang-eyes configure twitter-cookies "',
+        "kang-eyes configure twitter-cookies '",
+        'kang-eyes configure xhs-cookies "',
+        "kang-eyes configure xhs-cookies '",
+        "kang-eyes configure groq-key gsk_",
+        "kang-eyes configure openai-key sk-",
+        "kang-eyes configure github-token gh",
+        "kang-eyes configure proxy http",
     )
     violations = []
     for path in _policy_documents():

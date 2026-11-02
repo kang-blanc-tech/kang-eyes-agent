@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Facebook search and profiles through OpenCLI in the shared Agent Reach browser."""
+"""Facebook search and profiles through OpenCLI in the shared Kang Eyes Agent browser."""
 
 from ._opencli_site import OpenCLISiteChannel
 from .base import Action, Param

@@ -1,9 +1,9 @@
-"""Login state for upstream tools, kept under ~/.agent-reach/sessions/<tool>/.
+"""Login state for upstream tools, kept under ~/.kang-eyes/sessions/<tool>/.
 
 Command-line tools store their login in the user's home directory. We run
 each one with HOME pointed at its own session directory, so its login lives
-under Agent Reach and nowhere else. Uninstall removes it with the rest of
-~/.agent-reach/.
+under Kang Eyes Agent and nowhere else. Uninstall removes it with the rest of
+~/.kang-eyes/.
 """
 
 from __future__ import annotations
@@ -16,14 +16,14 @@ from agent_reach.utils.paths import ensure_no_symlink_path, home_dir, make_priva
 
 
 def sessions_root() -> Path:
-    return home_dir() / ".agent-reach" / "sessions"
+    return home_dir() / ".kang-eyes" / "sessions"
 
 
 def session_dir(tool: str) -> Path:
     """The tool's private home directory (created on first use)."""
     from . import state
     path = sessions_root() / tool
-    if path.exists() and not state.owned_path(path) and state.load()["tools"].get(tool, {}).get("owner") != "agent-reach":
+    if path.exists() and not state.owned_path(path) and state.load()["tools"].get(tool, {}).get("owner") != "kang-eyes":
         from .result import NEED_SETUP, ReachError
         raise ReachError(NEED_SETUP, "Unrecorded files occupy the native session directory; left untouched")
     path = make_private_dir(path)

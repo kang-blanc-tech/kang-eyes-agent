@@ -13,7 +13,7 @@ from agent_reach.runtime.result import BAD_INPUT, UPSTREAM_BROKEN, ReachError
 from .base import Action, Channel, Param
 
 _REDDIT_LOGIN_HINT = (
-    "Ask the user to log in to reddit.com in the Agent Reach dedicated browser. Never log in on their behalf."
+    "Ask the user to log in to reddit.com in the Kang Eyes Agent dedicated browser. Never log in on their behalf."
 )
 
 
