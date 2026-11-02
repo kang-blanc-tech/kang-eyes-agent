@@ -317,12 +317,14 @@ def _cmd_management(head: str, args: Sequence[str]) -> int:
             try:
                 result = manage.setup()
             except ReachError as err:
-                sys.stdout.write(f"安装未完成：{err.code} {err.message}\n{err.hint or ''}\n")
+                done = "安装未完成：" if manage._skill_lang() == "zh" else "Install not finished: "
+                sys.stdout.write(f"{done}{err.code} {err.message}\n{err.hint or ''}\n")
                 return 1
             sys.stdout.write(result['installation_report']['markdown'])
             report = result['installation_report']
             if report.get('path'):
-                sys.stdout.write(f"\n完整报告已保存：{report['path']}\n")
+                saved = "完整报告已保存：" if manage._skill_lang() == "zh" else "Full report saved: "
+                sys.stdout.write(f"\n{saved}{report['path']}\n")
             if report.get('write_error'):
                 sys.stdout.write(f"\n{report['write_error']}\n")
             return 0 if all(row['ok'] for row in result['default_channels']) else 1

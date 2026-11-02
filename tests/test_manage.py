@@ -541,6 +541,7 @@ class Broken(_Base):
 
 
 def test_setup_adds_default_channels_and_survives_a_failing_install(env, monkeypatch):
+    monkeypatch.setenv("AGENT_REACH_LANG", "zh")  # Kang Eyes Agent: this is upstream's Chinese receipt
     env["chans"].append(Broken())
 
     def failing_install(tool, *, global_=False):
@@ -572,6 +573,7 @@ def test_setup_adds_default_channels_and_survives_a_failing_install(env, monkeyp
 
 
 def test_setup_text_displays_compact_capability_table_and_keeps_json_mode(env, capsys, monkeypatch):
+    monkeypatch.setenv("AGENT_REACH_LANG", "zh")  # Kang Eyes Agent: this is upstream's Chinese receipt
     from agent_reach.runtime import cli, onboarding
 
     monkeypatch.setattr(onboarding, '_local_greeting', lambda: '早上好呀，想搜点什么？☀️')
@@ -589,7 +591,8 @@ def test_setup_text_displays_compact_capability_table_and_keeps_json_mode(env, c
     assert payload['result']['installation_report']['markdown'] == text.split('\n完整报告已保存：')[0]
 
 
-def test_setup_receipt_never_overwrites_a_linked_foreign_file(env, tmp_path):
+def test_setup_receipt_never_overwrites_a_linked_foreign_file(env, tmp_path, monkeypatch):
+    monkeypatch.setenv("AGENT_REACH_LANG", "zh")  # Kang Eyes Agent: this is upstream's Chinese receipt
     manage.setup()
     report = state.root() / 'installation-report.md'
     report.unlink()
@@ -604,6 +607,19 @@ def test_setup_receipt_never_overwrites_a_linked_foreign_file(env, tmp_path):
     assert result['installation_report']['path'] is None
     assert result['installation_report']['write_error']
     assert '| 平台 | 不登录可以查什么 | 需要登录后再试 |' in result['installation_report']['markdown']
+
+
+def test_kang_eyes_setup_receipt_is_english_by_default(env, capsys, monkeypatch):
+    """Kang Eyes Agent: with no language set (an AI agent's shell), the receipt and its messages are English."""
+    from agent_reach.runtime import cli
+    for var in ("AGENT_REACH_LANG", "LC_ALL", "LC_MESSAGES", "LANG"):
+        monkeypatch.delenv(var, raising=False)
+    cli.main(['setup', '--text'])
+    text = capsys.readouterr().out
+    assert '| Platform | Without a login | Needs a login |' in text
+    assert '**Kang Eyes Agent ' in text and 'Default channels ready: ' in text
+    assert 'Full report saved: ' in text
+    assert '| 平台 |' not in text and '完整报告已保存' not in text and '安装' not in text
 
 
 # ── uninstall ──

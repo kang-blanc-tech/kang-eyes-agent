@@ -18,9 +18,10 @@ upstream fixes merge cleanly.)
 `kang-blanc-tech/kang-eyes-agent`, never the original project, so a staff Mac only ever gets a version Kang
 released.
 
-**English by default.** The skill and the reports are written in English unless the environment asks for Chinese
-(`AGENT_REACH_LANG=zh`). Agent Reach defaults to Chinese whenever no English language is set, which is the case
-inside most AI agents' shells.
+**English by default.** The skill, the installation report and its messages are in English unless the environment asks
+for Chinese (`AGENT_REACH_LANG=zh`, or a `zh*` system language). Agent Reach defaults to Chinese whenever no English
+language is set, which is the case inside most AI agents' shells, and its installation report was Chinese only: ours
+adds an English report beside the original (`onboarding.py`, `_installation_report_en`); the Chinese one is unchanged.
 
 **YouTube captions: the video's own English track first.** `youtube subtitle` now asks for
 `en,en-orig,zh-Hans,zh` (Agent Reach: `zh-Hans,zh,en,en-orig`). Asking an English video for a Chinese machine
@@ -34,4 +35,8 @@ this file.
 **Unchanged:** every channel, tool and safety rule. It is read-only; it never logs in for the user and never asks
 for a password; keys are entered by the user in their own terminal.
 
-Tests: Agent Reach's own 523 tests pass on this version.
+**Tests:** all 529 pass: Agent Reach's own 523 (the three that check the Chinese receipt now set
+`AGENT_REACH_LANG=zh`, so they still test it), plus 6 of ours (`tests/test_kang_eyes.py` and
+`test_kang_eyes_setup_receipt_is_english_by_default`): English default, Chinese on request, English skill and receipt,
+English-first captions, our update source, our name and data folder. Undoing any one of those changes makes its test
+fail (checked 2026-11-02).

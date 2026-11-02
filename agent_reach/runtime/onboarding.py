@@ -77,9 +77,23 @@ _STATUS_LABELS = {
 }
 
 
+def _lang():
+    """'en' unless the environment asks for Chinese (Kang Eyes Agent; upstream was Chinese only here)."""
+    from .manage import _skill_lang
+    return _skill_lang()
+
+
 def _local_greeting():
     """Use the installing computer's clock and timezone, without a network lookup."""
     hour = datetime.now().hour
+    if _lang() != 'zh':
+        if 5 <= hour < 12:
+            return 'Good morning! What shall we look up? ☀️'
+        if 12 <= hour < 18:
+            return 'Good afternoon! What shall we look up?'
+        if 18 <= hour < 22:
+            return 'Good evening! What shall we look up?'
+        return 'Working late? What shall we look up? 🌙'
     if 5 <= hour < 11:
         return '早上好呀，想搜点什么？☀️'
     if 11 <= hour < 14:
@@ -114,6 +128,89 @@ def _upgrade_lines(result):
 
 
 def installation_report(result):
+    """Render one short receipt in the user's language (English unless the environment asks for Chinese)."""
+    return _installation_report_zh(result) if _lang() == 'zh' else _installation_report_en(result)
+
+
+# English tables for the receipt (Kang Eyes Agent). The Chinese ones above are upstream's, unchanged.
+_QUICK_ACCESS_EN = {
+    'xiaoyuzhou': ('🔑 transcription needs a key', '—'),
+    'github': ('✅ find repos, read docs, discussions and comments', '—'),
+    'youtube': ('✅ find videos, read descriptions and subtitles', '—'),
+    'bilibili': ('✅ find videos, read descriptions', '❌ subtitles'),
+    'v2ex': ('✅ read topics and replies', '—'),
+    'web': ('✅ search, read pages', '—'),
+    'reddit': ('✅ search posts, read text and comments', '—'),
+    'twitter': ('✅ search summaries, try full posts', '❌ search tweets, timelines, replies'),
+    'xiaohongshu': ('✅ search summaries, find links', '❌ site search, notes, comments'),
+    'instagram': ('✅ search bios', '❌ find users, profiles, posts'),
+    'facebook': ('✅ search summaries', '❌ site search, profiles'),
+    'linkedin': ('✅ find jobs, read public details', '❌ site search'),
+    'boss': ('✅ search titles, find links', '❌ site search, job details'),
+    'xueqiu': ('✅ find stocks, quotes', '❌ hot posts, hot stocks'),
+}
+
+_DISPLAY_NAMES_EN = {
+    'xiaoyuzhou': 'Xiaoyuzhou',
+    'github': 'GitHub', 'youtube': 'YouTube', 'bilibili': 'Bilibili', 'v2ex': 'V2EX',
+    'web': 'Web', 'reddit': 'Reddit', 'twitter': 'X / Twitter', 'facebook': 'Facebook',
+    'instagram': 'Instagram', 'xiaohongshu': 'Xiaohongshu', 'linkedin': 'LinkedIn',
+    'boss': 'Boss Zhipin', 'xueqiu': 'Xueqiu',
+}
+
+_STATUS_LABELS_EN = {
+    'not_added': 'not added, add when needed', 'needs_setup': 'needs setup', 'unverified': 'added, not live-tested',
+    'ready': 'live-tested', 'search_ready': 'search live-tested only',
+    'needs_login': 'the tested action needs a login', 'cooldown': 'paused for now',
+    'needs_user_action': 'waiting for you to verify', 'broken': 'this route is broken now',
+}
+
+
+def _installation_report_en(result):
+    """The receipt in English: the same rows and rules as the Chinese one."""
+    def cell(value):
+        return str(value).replace('|', r'\|').replace('\n', ' ')
+
+    entries = result['capability_summary']['channels']
+    installs = {row['channel']: row for row in result['default_channels']}
+    installed = sum(bool(row['ok']) for row in installs.values())
+    completed = all(row['ok'] for row in installs.values())
+    lines = [
+        _local_greeting(), '',
+        f"**Kang Eyes Agent {result['version']} {'is installed' if completed else 'needs one more step'}.** "
+        f'Default channels ready: {installed}/{len(installs)}.', '',
+        *_upgrade_lines(result),
+        '✅ works without a login; ❌ try after logging in; 🔑 needs a key; — nothing extra needed.', '',
+        '| Platform | Without a login | Needs a login |', '|---|---|---|',
+    ]
+    for entry in sorted(entries, key=lambda item: item['level'] != 'default'):
+        name = entry['channel']
+        label = _DISPLAY_NAMES_EN.get(name, name)
+        item = installs.get(name)
+        if entry['level'] == 'default':
+            if item and not item['ok']:
+                label += ' (install failed: ' + item.get('error', {}).get('code', 'UNKNOWN') + ')'
+            elif not item:
+                label += ' (removed by you)'
+        elif entry['reach_status'] in {'needs_setup', 'needs_login', 'cooldown', 'needs_user_action', 'broken'}:
+            label += ' (' + _STATUS_LABELS_EN[entry['reach_status']] + ')'
+        public, login = _QUICK_ACCESS_EN.get(name, (entry['public_access'], '—'))
+        lines.append('| ' + ' | '.join(cell(value) for value in (label, public, login)) + ' |')
+    verified = [entry for entry in entries if entry['verified_actions']]
+    if verified:
+        names = '; '.join(_DISPLAY_NAMES_EN.get(entry['channel'], entry['channel']) + ': ' +
+                          '/'.join(entry['verified_actions']) for entry in verified)
+        lines += ['', 'Live-tested: ' + names + '. The rest are not live-tested yet.']
+    else:
+        lines += ['', 'Not live-tested yet.']
+    lines += ['Summaries, titles and links come from search engines first; comments are what was actually read; '
+              'subtitles only when the video has them.', '',
+              '**Just ask for what you want.** It reuses an existing login first, and opens a window only when you '
+              'really need to sign in.']
+    return '\n'.join(lines) + '\n'
+
+
+def _installation_report_zh(result):
     """Render one short receipt; keep detailed evidence in the structured summary."""
     def cell(value):
         return str(value).replace('|', r'\|').replace('\n', ' ')

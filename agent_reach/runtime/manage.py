@@ -409,7 +409,9 @@ def _skill_lang() -> str:
         v = os.environ.get(var, "").strip().lower()
         if v.startswith("en"):
             return "en"
-    return "en"   # Kang Eyes Agent: English unless the environment asks otherwise (upstream: "zh")
+        if v.startswith("zh"):
+            return "zh"
+    return "en"   # Kang Eyes Agent: English unless the environment asks for Chinese (upstream default: "zh")
 
 
 def render_skill(lang: Optional[str] = None) -> str:
@@ -708,7 +710,8 @@ def setup() -> dict:
         report["path"] = str(atomic_write_private_text(state.root() / "installation-report.md", markdown))
     except (OSError, PrivatePathError):
         # The receipt remains in stdout even if its local copy cannot be saved.
-        report["write_error"] = "安装报告未能保存；完整表格仍在 installation_report.markdown。"
+        report["write_error"] = ("安装报告未能保存；完整表格仍在 installation_report.markdown。" if _skill_lang() == "zh"
+                                 else "The report could not be saved; the full table is still in installation_report.markdown.")
     result["installation_report"] = report
     if migration:
         state.mutate(lambda saved: saved.__setitem__("migration_reported", True))
